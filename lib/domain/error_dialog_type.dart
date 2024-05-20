@@ -1,0 +1,1 @@
+enum ErrorDialogType { unsupported, transaction }
