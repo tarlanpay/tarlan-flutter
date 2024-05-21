@@ -38,6 +38,7 @@ final class TarlanProvider with ChangeNotifier {
   var isLoading = true;
   var currentFlow = TarlanFlow.form;
   ErrorResultRoute? error;
+  SuccessDialogResultRoute? success;
 
   var disposed = false;
   @override
@@ -52,6 +53,7 @@ final class TarlanProvider with ChangeNotifier {
   }
 
   Future<void> load() async {
+    isLoading = true;
     try {
       paymentHelper = PaymentHelper();
       colorsInfo = await merchantWebService.getColorsInfo();
@@ -121,7 +123,7 @@ final class TarlanProvider with ChangeNotifier {
 
   bool isOneClick() => type == TarlanType.oneClickPayIn || type == TarlanType.oneClickPayOut;
 
-  Future makePayment() async {
+  Future createTransaction() async {
     isLoading = true;
     notifyListeners();
     final paymentResultRoute = await paymentHelper.doTransaction(type, paymentWebService);
@@ -137,6 +139,8 @@ final class TarlanProvider with ChangeNotifier {
       _launch3DS(route.threeDs);
     } else if (route is FingerprintResultRoute) {
       _launchFingerprint(route.fingerprint);
+    } else if (route is SuccessDialogResultRoute) {
+      _launchSuccessFlow(route);
     }
   }
 
@@ -145,6 +149,17 @@ final class TarlanProvider with ChangeNotifier {
     threeDs = data;
     currentFlow = TarlanFlow.threeDs;
     notifyListeners();
+  }
+
+  void threeDsFinished() {
+    isLoading = true;
+    if (type == TarlanType.cardLink) {
+      _launchSuccessFlow(SuccessDialogResultRoute());
+    } else {
+      currentFlow = TarlanFlow.receipt;
+      notifyListeners();
+      _launchReceipt();
+    }
   }
 
   void _launchFingerprint(Fingerprint fingerprint) {
@@ -176,8 +191,19 @@ final class TarlanProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void _launchSuccessFlow(SuccessDialogResultRoute route) {
+    isLoading = false;
+    success = route;
+    notifyListeners();
+  }
+
   void clearError() {
     error = null;
+    notifyListeners();
+  }
+
+  void clearSuccess() {
+    success = null;
     notifyListeners();
   }
 
@@ -186,6 +212,14 @@ final class TarlanProvider with ChangeNotifier {
   bool showDetails() {
     final isTypeApplicable = type == TarlanType.payIn || type == TarlanType.cardLink;
     return isTypeApplicable && _isNewTransaction();
+  }
+
+  bool showRememberCardOption() {
+    return type == TarlanType.payIn || type == TarlanType.payOut;
+  }
+
+  bool isCardLink() {
+    return type == TarlanType.cardLink;
   }
 
   void setCardNumber(String value) {
@@ -257,5 +291,17 @@ final class TarlanProvider with ChangeNotifier {
     final queryParameters = {'hash': urlData?.hash, 'id': urlData?.transactionId};
     final uri = Uri.https(ApiClient().baseUrl(ApiType.main), ApiConstants.pathReceiptDownload, queryParameters);
     return uri.toString();
+  }
+
+  void deactivateCard(String cardToken) async {
+    try {
+      final projectIdString = SessionData().getProjectId();
+      if (projectIdString != null) {
+        final projectId = int.parse(projectIdString);
+        paymentHelper.cardDeactivatePostData.encryptedCardId = cardToken;
+        paymentHelper.cardDeactivatePostData.projectId = projectId;
+        await paymentWebService.deactivateCard(paymentHelper.cardDeactivatePostData);
+      }
+    } catch (_) {}
   }
 }

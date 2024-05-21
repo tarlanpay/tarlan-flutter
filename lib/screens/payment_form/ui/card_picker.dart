@@ -25,7 +25,7 @@ class CardPicker extends StatefulWidget {
 
 class _CardPickerState extends State<CardPicker> {
   // A map to keep track of the card being deleted
-  Map<String, bool> _deletingCards = {};
+  final Map<String, bool> _deletingCards = {};
 
   LinearGradient mainGradient() {
     return LinearGradient(
@@ -125,11 +125,16 @@ class _CardPickerState extends State<CardPicker> {
                                   IconButton(
                                     icon: Icon(Icons.check, color: mainColor),
                                     onPressed: () {
-                                      // Confirm deletion
+                                      widget.provider.deactivateCard(card.cardToken);
                                       setState(() {
                                         widget.cards.remove(card);
+                                        if (widget.cards.isEmpty) {
+                                          widget.controller.text = '';
+                                          widget.provider.switchToRegularPay();
+                                          widget.provider.notify();
+                                          Navigator.pop(context);
+                                        }
                                         _deletingCards.remove(item);
-                                        widget.provider.notify();
                                       });
                                     },
                                   ),

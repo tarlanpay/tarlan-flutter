@@ -1,5 +1,4 @@
 import '/data/model/pay_in/pay_in_response.dart';
-
 import 'error_dialog_type.dart';
 
 abstract class PaymentResultRoute {}
@@ -18,6 +17,10 @@ class FingerprintResultRoute extends PaymentResultRoute {
 
 class ReceiptResultRoute extends PaymentResultRoute {
   ReceiptResultRoute();
+}
+
+class SuccessDialogResultRoute extends PaymentResultRoute {
+  SuccessDialogResultRoute();
 }
 
 class ErrorResultRoute extends PaymentResultRoute {

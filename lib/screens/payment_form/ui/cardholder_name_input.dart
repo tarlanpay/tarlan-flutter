@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '/domain/tarlan_provider.dart';
-import '/utils/hex_color.dart';
 
 import '../../../utils/upper_text.dart';
+import '/domain/tarlan_provider.dart';
+import '/utils/hex_color.dart';
 import 'label.dart';
 
 class CardHolderNameInput extends StatefulWidget {
@@ -31,13 +31,12 @@ class _CardHolderNameInputState extends State<CardHolderNameInput> {
           child: TextField(
             controller: _controller,
             textAlign: TextAlign.center,
+            cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
             style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
             decoration: InputDecoration(
               fillColor: HexColor(provider.colorsInfo.mainInputColor),
               filled: true,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
-              hintStyle: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
-              hintText: "IVAN IVANOV",
               isDense: true,
               contentPadding: const EdgeInsets.all(5),
             ),

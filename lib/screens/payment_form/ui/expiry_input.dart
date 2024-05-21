@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '/domain/tarlan_provider.dart';
 
 import '../../../utils/hex_color.dart';
+import '/domain/tarlan_provider.dart';
 import 'label.dart';
 
 class ExpiryInput extends StatefulWidget {
@@ -34,6 +34,8 @@ class _ExpiryInputState extends State<ExpiryInput> {
                 width: 70,
                 child: TextField(
                   textAlign: TextAlign.center,
+                  keyboardType: TextInputType.number,
+                  cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
                   style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
                   decoration: InputDecoration(
                     fillColor: HexColor(provider.colorsInfo.mainInputColor),
@@ -56,6 +58,8 @@ class _ExpiryInputState extends State<ExpiryInput> {
                 height: 40,
                 child: TextField(
                   textAlign: TextAlign.center,
+                  keyboardType: TextInputType.number,
+                  cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
                   style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
                   decoration: InputDecoration(
                     fillColor: HexColor(provider.colorsInfo.mainInputColor),

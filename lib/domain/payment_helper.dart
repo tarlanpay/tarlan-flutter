@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:tarlan_payments/data/card_deactivate/card_deactivate_post_data.dart';
 
 import '../data/model/common/post_data/one_click_post_data.dart';
 import '../data/model/pay_in/pay_in_post_data.dart';
@@ -22,13 +23,21 @@ class PaymentHelper {
 
   OneClickPostData get oneClickPostData => _oneClickPostData;
 
+  late CardDeactivatePostData _cardDeactivatePostData;
+
+  CardDeactivatePostData get cardDeactivatePostData => _cardDeactivatePostData;
+
+  TarlanType? type;
+
   PaymentHelper() {
     _payInPostData = PayInPostData();
     _payOutPostData = PayOutPostData();
     _oneClickPostData = OneClickPostData();
+    _cardDeactivatePostData = CardDeactivatePostData();
   }
 
   Future<PaymentResultRoute> doTransaction(TarlanType type, PaymentWebService paymentWebService) async {
+    this.type = type;
     try {
       switch (type) {
         case TarlanType.payIn:
@@ -75,17 +84,29 @@ class PaymentHelper {
       if (threeDs.params != null && threeDs.action != null) {
         return ThreeDsResultRoute(threeDs: threeDs);
       } else {
-        return ReceiptResultRoute();
+        if (type == TarlanType.cardLink) {
+          return SuccessDialogResultRoute();
+        } else {
+          return ReceiptResultRoute();
+        }
       }
     } else if (status == 'fingerprint' && result?.fingerprint != null) {
       final fingerprint = result!.fingerprint!;
       if (fingerprint.methodData != null && fingerprint.methodUrl != null) {
         return FingerprintResultRoute(fingerprint: fingerprint);
       } else {
-        return ReceiptResultRoute();
+        if (type == TarlanType.cardLink) {
+          return SuccessDialogResultRoute();
+        } else {
+          return ReceiptResultRoute();
+        }
       }
     } else {
-      return ReceiptResultRoute();
+      if (type == TarlanType.cardLink) {
+        return SuccessDialogResultRoute();
+      } else {
+        return ReceiptResultRoute();
+      }
     }
   }
 }

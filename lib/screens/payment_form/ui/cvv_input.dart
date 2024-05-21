@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '/domain/tarlan_provider.dart';
 
 import '../../../utils/hex_color.dart';
+import '/domain/tarlan_provider.dart';
 import 'label.dart';
 
 class CvvInput extends StatefulWidget {
@@ -32,6 +32,8 @@ class _CvvState extends State<CvvInput> {
             child: TextField(
               controller: _controller,
               textAlign: TextAlign.center,
+              keyboardType: TextInputType.number,
+              cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
               style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
               decoration: InputDecoration(
                 fillColor: HexColor(provider.colorsInfo.mainInputColor),

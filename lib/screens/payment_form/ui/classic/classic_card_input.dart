@@ -22,7 +22,7 @@ class ClassicCardInput extends StatefulWidget {
 
 class _ClassicCardInputState extends State<ClassicCardInput> {
   late TextEditingController _controller;
-  static const double inputHeight = 40.0;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -38,6 +38,13 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
 
   List<String> _getMenuItems(TarlanProvider provider) {
     return provider.transactionInfo.cards.map((e) => e.maskedPan).toList();
+  }
+
+  void _validateCardNumber(String value) {
+    setState(() {
+      // Validate that the card number has 19 characters including spaces
+      _hasError = value.length != 19 || !RegExp(r'^\d{4} \d{4} \d{4} \d{4}$').hasMatch(value);
+    });
   }
 
   @override
@@ -83,38 +90,39 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
   }
 
   Widget _buildCardNumberInput(TarlanProvider provider, List<String> menuItems, List<TransactionCard> cards) {
-    return SizedBox(
-      height: inputHeight,
-      child: TextField(
-        textAlign: TextAlign.center,
-        controller: _controller,
-        style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
-        readOnly: provider.isOneClick(),
-        decoration: InputDecoration(
-          fillColor: HexColor(provider.colorsInfo.mainInputColor),
-          filled: true,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0),
-            borderSide: BorderSide.none,
-          ),
-          hintStyle: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
-          hintText: "XXXX XXXX XXXX XXXX",
-          isDense: true,
-          contentPadding: const EdgeInsets.all(Space.xs),
-          suffixIcon: menuItems.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.arrow_drop_down, color: Colors.white), // Ensure the icon is visible
-                  onPressed: () => _showCardSelectionSheet(context, provider, menuItems, cards),
-                )
-              : null,
+    return TextField(
+      textAlign: TextAlign.center,
+      controller: _controller,
+      cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
+      keyboardType: TextInputType.number,
+      style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
+      readOnly: provider.isOneClick(),
+      decoration: InputDecoration(
+        fillColor: HexColor(provider.colorsInfo.mainInputColor),
+        filled: true,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(5.0),
+          borderSide: BorderSide.none,
         ),
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
-          CardNumberFormatter(),
-          LengthLimitingTextInputFormatter(19),
-        ],
-        onChanged: provider.setCardNumber,
+        errorText: _hasError ? 'Неверный номер карты' : null,
+        isDense: true,
+        contentPadding: const EdgeInsets.all(Space.xs),
+        suffixIcon: menuItems.isNotEmpty && !provider.isCardLink()
+            ? IconButton(
+                icon: const Icon(Icons.arrow_drop_down, color: Colors.white), // Ensure the icon is visible
+                onPressed: () => _showCardSelectionSheet(context, provider, menuItems, cards),
+              )
+            : null,
       ),
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        CardNumberFormatter(),
+        LengthLimitingTextInputFormatter(19),
+      ],
+      onChanged: (value) {
+        provider.setCardNumber(value.trim());
+        _validateCardNumber(value.trim());
+      },
     );
   }
 

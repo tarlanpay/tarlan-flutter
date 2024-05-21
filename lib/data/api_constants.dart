@@ -8,6 +8,7 @@ class ApiConstants {
 
   static String pathTransactionInfo = '/transaction/api/v1/transaction';
   static String pathCardLink = '/transaction/api/v1/transaction/card-link';
+  static String pathCardDeactivate = '/transaction/api/v1/tokens/deactivate';
   static String pathPayIn = '/transaction/api/v1/transaction/pay-in';
   static String pathPayOut = '/transaction/api/v1/transaction/pay-out';
   static String pathOneClickPayIn = '/transaction/api/v1/transaction/one-click/pay-in';

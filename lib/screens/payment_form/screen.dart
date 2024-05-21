@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tarlan_payments/screens/common/logos.dart';
+import 'package:tarlan_payments/screens/success_dialog/success_dialog.dart';
 
 import '../../data/model/common/session_data.dart';
 import '../../domain/tarlan_provider.dart';
@@ -26,12 +27,12 @@ class _PaymentFormState extends State<PaymentForm> {
   Widget build(BuildContext context) {
     final provider = Provider.of<TarlanProvider>(context);
 
-    _showErrorModalIfNeeded(context, provider);
+    _showModalIfNeeded(context, provider);
 
     return provider.isLoading ? const Center(child: CircularProgressIndicator()) : _buildForm(context, provider);
   }
 
-  void _showErrorModalIfNeeded(BuildContext context, TarlanProvider provider) {
+  void _showModalIfNeeded(BuildContext context, TarlanProvider provider) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (provider.error != null) {
         showModalBottomSheet(
@@ -46,6 +47,18 @@ class _PaymentFormState extends State<PaymentForm> {
           SessionData().triggerOnErrorCallback();
           Navigator.of(context).pop(); // Example: clear the error in the provider
         });
+      } else if (provider.success != null) {
+        showModalBottomSheet(
+            context: context,
+            isScrollControlled: false,
+            isDismissible: true,
+            builder: (context) => SuccessScreen(
+                  mainFormColor: HexColor(provider.colorsInfo.mainFormColor),
+                )).whenComplete(() {
+          provider.clearSuccess();
+          SessionData().triggerOnSuccessCallback();
+          Navigator.of(context).pop(); // Example: clear the error in the provider
+        });
       }
     });
   }
@@ -58,7 +71,7 @@ class _PaymentFormState extends State<PaymentForm> {
           _buildHeader(provider),
           const SizedBox(height: Space.l),
           const ClassicCardInput(),
-          if (provider.showDetails()) _buildRememberCardRow(provider),
+          provider.showRememberCardOption() ? _buildRememberCardRow(provider) : const SizedBox(height: Space.s),
           if (!provider.showDetails()) const SizedBox(height: 24),
           _buildPayButton(context, provider),
           const SizedBox(height: Space.s),
@@ -112,9 +125,8 @@ class _PaymentFormState extends State<PaymentForm> {
       ),
       child: ElevatedButton(
         onPressed: () {
-          provider.setMockData();
           provider.setSaveCard(saveChecked);
-          provider.makePayment();
+          provider.createTransaction();
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,

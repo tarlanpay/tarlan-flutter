@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'example_transaction_create_screen.dart';
-import 'transaction_url_provider.dart';
+import 'example/example_transaction_create_screen.dart';
+import 'example/transaction_url_provider.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(create: (context) => TransactionUrlProvider(), child: const MyApp()));

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
+import 'package:tarlan_payments/data/card_deactivate/card_deactivate_post_data.dart';
 
 import '../../../network/request.dart';
 import '../../api_constants.dart';
@@ -31,6 +32,23 @@ class PaymentWebService {
       return ApiResponse<PayInResult>.fromJson(
         jsonDecode(response.body),
         (json) => PayInResult.fromJson(json),
+      );
+    } catch (e) {
+      throw ErrorsResponse(response: e.toString());
+    }
+  }
+
+  Future<ApiResponse<String>> deactivateCard(CardDeactivatePostData postData) async {
+    UrlData urlData = SessionData().getUrlData()!;
+    postData.transactionId = int.parse(urlData.transactionId);
+    postData.transactionHash = urlData.hash;
+    final request =
+        Request(method: HttpMethod.post, path: ApiConstants.pathCardDeactivate, body: jsonEncode(postData.toJson()));
+    try {
+      final response = await api.send(request);
+      return ApiResponse<String>.fromJson(
+        jsonDecode(response.body),
+        (json) => json.toString(),
       );
     } catch (e) {
       throw ErrorsResponse(response: e.toString());

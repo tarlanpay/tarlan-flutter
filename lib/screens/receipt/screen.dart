@@ -31,7 +31,6 @@ class _ReceiptState extends State<Receipt> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TarlanProvider>(context);
-    final info = provider.receiptInfo;
     return provider.isLoading
         ? const Center(child: CircularProgressIndicator())
         : SingleChildScrollView(
@@ -44,24 +43,26 @@ class _ReceiptState extends State<Receipt> {
                 const SizedBox(height: Space.xl),
                 DashedLine(color: HexColor('#A4A4A4')),
                 const SizedBox(height: Space.l),
-                _buildReceiptRow(context, 'Номер заказа', '№${info.transactionId}'),
+                _buildReceiptRow(context, 'Номер заказа', '№${provider.receiptInfo.transactionId}'),
                 _buildDashedLine(),
                 const SizedBox(height: Space.m),
-                _buildReceiptRow(context, 'Сумма оплаты', '${info.totalAmount}${info.currency}'),
+                _buildReceiptRow(
+                    context, 'Сумма оплаты', '${provider.receiptInfo.totalAmount}${provider.receiptInfo.currency}'),
                 _buildDashedLine(),
                 const SizedBox(height: Space.m),
-                _buildReceiptRow(context, 'Комиссия', '${info.upperCommissionAmount}${info.currency}'),
+                _buildReceiptRow(context, 'Комиссия',
+                    '${provider.receiptInfo.upperCommissionAmount}${provider.receiptInfo.currency}'),
                 _buildDashedLine(),
                 const SizedBox(height: Space.m),
-                _buildReceiptRow(context, 'Дата транзакции', '${info.dateTime}'),
+                _buildReceiptRow(context, 'Дата транзакции', '${provider.receiptInfo.dateTime}'),
                 _buildDashedLine(),
                 const SizedBox(height: Space.m),
-                _buildReceiptRow(context, 'Банк-эквайер', info.acquirerName),
+                _buildReceiptRow(context, 'Банк-эквайер', provider.receiptInfo.acquirerName),
                 _buildDashedLine(),
                 const SizedBox(height: Space.m),
                 Center(
                   child: Text(
-                    info.projectName,
+                    provider.receiptInfo.projectName,
                     style: TextStyle(fontSize: 12, color: ReceiptDS.additionalTextColor),
                   ),
                 ),
@@ -74,7 +75,7 @@ class _ReceiptState extends State<Receipt> {
                   () {
                     FileDownloader.downloadFile(
                         url: provider.receiptPdfUrl(),
-                        name: '${info.transactionId.toString()}.pdf',
+                        name: '${provider.receiptInfo.transactionId.toString()}.pdf',
                         onProgress: (fileName, progress) {
                           setState(() {
                             savePdfTitle = 'Загрузка квитанции...';
