@@ -52,7 +52,7 @@ class Fingerprint {
 
 class ThreeDs {
   bool? is3Ds;
-  Map<String, String>? params;
+  Map<String, dynamic>? params;
   String? action;
   String? termUrl;
 
@@ -63,25 +63,17 @@ class ThreeDs {
     this.termUrl,
   });
 
-  factory ThreeDs.fromJson(Map<String, dynamic> json) {
-    Map<String, String> params = {};
-    json['params'].forEach((key, value) {
-      params[key] = value.toString();
-    });
-    return ThreeDs(
-      is3Ds: json["is_3ds"],
-      params: params,
-      action: json["action"],
-      termUrl: json["termUrl"],
-    );
-  }
+  factory ThreeDs.fromJson(Map<String, dynamic> json) => ThreeDs(
+        is3Ds: json["is_3ds"],
+        params: (json["params"] != null) ? Map<String, dynamic>.from(json["params"]) : null,
+        action: json["action"],
+        termUrl: json["termUrl"],
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      "is_3ds": is3Ds,
-      "params": params,
-      "action": action,
-      "termUrl": termUrl,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        "is_3ds": is3Ds,
+        "params": params,
+        "action": action,
+        "termUrl": termUrl,
+      };
 }

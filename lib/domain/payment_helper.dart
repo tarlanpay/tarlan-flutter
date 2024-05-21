@@ -1,13 +1,13 @@
 import 'package:flutter/widgets.dart';
-import '/data/model/common/type.dart';
-import '/data/webservices/payment/payment_webservice.dart';
-import '/domain/error_dialog_type.dart';
-import '/domain/payment_result_route.dart';
 
 import '../data/model/common/post_data/one_click_post_data.dart';
 import '../data/model/pay_in/pay_in_post_data.dart';
 import '../data/model/pay_in/pay_in_response.dart';
 import '../data/model/pay_out/pay_out_post_data.dart';
+import '/data/model/common/type.dart';
+import '/data/webservices/payment/payment_webservice.dart';
+import '/domain/error_dialog_type.dart';
+import '/domain/payment_result_route.dart';
 
 class PaymentHelper {
   late PayInPostData _payInPostData;
@@ -28,7 +28,7 @@ class PaymentHelper {
     _oneClickPostData = OneClickPostData();
   }
 
-  Future<PaymentResultRoute> pay(TarlanType type, PaymentWebService paymentWebService) async {
+  Future<PaymentResultRoute> doTransaction(TarlanType type, PaymentWebService paymentWebService) async {
     try {
       switch (type) {
         case TarlanType.payIn:
@@ -69,7 +69,6 @@ class PaymentHelper {
   }
 
   Future<PaymentResultRoute> checkResult(PayInResult? result) async {
-    debugPrint("PAY IN RESULT: ${result?.toJson()}");
     var status = result?.transactionStatusCode;
     if (status == 'threeds_waiting' && result?.threeDs != null) {
       var threeDs = result!.threeDs!;

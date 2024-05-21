@@ -49,4 +49,22 @@ class TransactionWebService {
     }
     throw ErrorsResponse(response: 'Unknown');
   }
+
+  Future<ReceiptInfo> downloadPdf() async {
+    UrlData? urlData = SessionData().getUrlData();
+    final queryParameters = {
+      'hash': urlData?.hash,
+    };
+    final request = Request(path: ApiConstants.pathReceipt, queryParams: queryParameters);
+    try {
+      final response = await api.send(request);
+      if (response.statusCode == 200) {
+        return receiptResponseFromJson(response.body).result;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      throw ErrorsResponse(response: e.toString());
+    }
+    throw ErrorsResponse(response: 'Unknown');
+  }
 }

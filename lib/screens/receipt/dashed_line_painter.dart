@@ -5,7 +5,7 @@ class DashedLinePainter extends CustomPainter {
   DashedLinePainter({this.customColor});
   @override
   void paint(Canvas canvas, Size size) {
-    double dashWidth = 9, dashSpace = 5, startX = 0;
+    double dashWidth = 3, dashSpace = 2, startX = 0;
     final paint = Paint()
       ..color = customColor ?? Colors.grey
       ..strokeWidth = 1;

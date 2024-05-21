@@ -1,4 +1,13 @@
 import 'package:flutter/widgets.dart';
+import 'package:tarlan_payments/data/api_constants.dart';
+import 'package:tarlan_payments/data/model/common/session_data.dart';
+import 'package:tarlan_payments/domain/error_dialog_type.dart';
+import 'package:tarlan_payments/network/api_client.dart';
+import 'package:tarlan_payments/network/environment.dart';
+
+import '../../data/model/pay_in/pay_in_response.dart';
+import '../data/model/receipt/receipt_info.dart';
+import '../network/api_type.dart';
 import '/data/model/common/status.dart';
 import '/data/model/common/type.dart';
 import '/data/model/transaction/colors_info.dart';
@@ -10,9 +19,6 @@ import '/data/webservices/transaction/transaction_webservice.dart';
 import '/domain/flow.dart';
 import '/domain/payment_helper.dart';
 import '/domain/payment_result_route.dart';
-
-import '../../data/model/pay_in/pay_in_response.dart';
-import '../data/model/receipt/receipt_info.dart';
 
 final class TarlanProvider with ChangeNotifier {
   late ColorsInfo colorsInfo;
@@ -118,7 +124,7 @@ final class TarlanProvider with ChangeNotifier {
   Future makePayment() async {
     isLoading = true;
     notifyListeners();
-    final paymentResultRoute = await paymentHelper.pay(type, paymentWebService);
+    final paymentResultRoute = await paymentHelper.doTransaction(type, paymentWebService);
     checkPaymentResultRoute(paymentResultRoute);
   }
 
@@ -151,12 +157,14 @@ final class TarlanProvider with ChangeNotifier {
       if (disposed) {
         return;
       }
+      currentFlow = TarlanFlow.receipt;
       isLoading = false;
       notifyListeners();
     } catch (_) {
       if (disposed) {
         return;
       }
+      error = ErrorResultRoute(type: ErrorDialogType.unsupported, message: 'Unknown');
       isLoading = false;
       notifyListeners();
     }
@@ -185,6 +193,22 @@ final class TarlanProvider with ChangeNotifier {
       paymentHelper.payInPostData.pan = value;
     } else if (type == TarlanType.payOut) {
       paymentHelper.payOutPostData.pan = value;
+    }
+  }
+
+  void setMockData() {
+    if (SessionData().getEnvironment() == Environment.prod) {
+      setCardNumber('4400 4302 7893 5314');
+      setExpiryYear('25');
+      setExpiryMonth('04');
+      setCVV('291');
+      setCardHolderName('TARLAN PROD');
+    } else {
+      setCardNumber('5356502005439678');
+      setExpiryYear('25');
+      setExpiryMonth('04');
+      setCVV('291');
+      setCardHolderName('TARLAN SANDBOX');
     }
   }
 
@@ -226,5 +250,12 @@ final class TarlanProvider with ChangeNotifier {
     if (type == TarlanType.payIn) {
       paymentHelper.payInPostData.save = saveCard ?? true;
     }
+  }
+
+  String receiptPdfUrl() {
+    final urlData = SessionData().getUrlData();
+    final queryParameters = {'hash': urlData?.hash, 'id': urlData?.transactionId};
+    final uri = Uri.https(ApiClient().baseUrl(ApiType.main), ApiConstants.pathReceiptDownload, queryParameters);
+    return uri.toString();
   }
 }

@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
-import '/network/api_client.dart';
-import '/network/http_method.dart';
 
 import '../../../network/request.dart';
 import '../../api_constants.dart';
@@ -14,6 +12,8 @@ import '../../model/pay_in/pay_in_post_data.dart';
 import '../../model/pay_in/pay_in_response.dart';
 import '../../model/pay_out/pay_out_post_data.dart';
 import '../errors.dart';
+import '/network/api_client.dart';
+import '/network/http_method.dart';
 
 class PaymentWebService {
   final api = ApiClient();
@@ -24,7 +24,8 @@ class PaymentWebService {
     postData.transactionHash = urlData.hash;
     postData.pan = postData.pan?.replaceAll(' ', '');
     postData.save = true;
-    final request = Request(path: ApiConstants.pathCardLink, body: jsonEncode(postData.toJson()));
+    final request =
+        Request(path: ApiConstants.pathCardLink, body: jsonEncode(postData.toJson()), method: HttpMethod.post);
     try {
       final response = await api.send(request);
       return ApiResponse<PayInResult>.fromJson(
@@ -41,7 +42,7 @@ class PaymentWebService {
     postData.transactionId = int.parse(urlData.transactionId);
     postData.transactionHash = urlData.hash;
     postData.pan = postData.pan?.replaceAll(' ', '');
-    final request = Request(path: ApiConstants.pathPayIn, body: jsonEncode(postData.toJson()));
+    final request = Request(path: ApiConstants.pathPayIn, body: jsonEncode(postData.toJson()), method: HttpMethod.post);
     try {
       final response = await api.send(request);
       return ApiResponse<PayInResult>.fromJson(
@@ -58,7 +59,8 @@ class PaymentWebService {
     postData.transactionId = int.parse(urlData.transactionId);
     postData.transactionHash = urlData.hash;
     postData.pan = postData.pan?.replaceAll(' ', '');
-    final request = Request(path: ApiConstants.pathPayOut, body: jsonEncode(postData.toJson()));
+    final request =
+        Request(path: ApiConstants.pathPayOut, body: jsonEncode(postData.toJson()), method: HttpMethod.post);
     try {
       final response = await api.send(request);
       if (response.statusCode == 200) {
@@ -92,7 +94,8 @@ class PaymentWebService {
     UrlData urlData = SessionData().getUrlData()!;
     postData.transactionId = int.parse(urlData.transactionId);
     postData.transactionHash = urlData.hash;
-    final request = Request(path: ApiConstants.pathOneClickPayOut, body: jsonEncode(postData.toJson()));
+    final request =
+        Request(path: ApiConstants.pathOneClickPayOut, body: jsonEncode(postData.toJson()), method: HttpMethod.post);
     try {
       final response = await api.send(request);
       if (response.statusCode == 200) {

@@ -14,7 +14,10 @@ class Request {
   Request(
       {this.method = HttpMethod.get,
       required this.path,
-      this.httpHeaders = const {HttpHeaders.acceptHeader: 'application/json'},
+      this.httpHeaders = const {
+        HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.contentTypeHeader: 'application/json'
+      },
       this.body,
       this.apiType = ApiType.main,
       this.queryParams});

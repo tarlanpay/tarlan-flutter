@@ -18,7 +18,7 @@ class _ExampleTransactionCreateScreenState extends State<ExampleTransactionCreat
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Tarlan Sample Client'),
+            title: const Text('Tarlan Transaction Generator'),
           ),
           body: _buildBody(context, model),
         );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tarlan_payments/screens/common/logos.dart';
 
 import '../../data/model/common/session_data.dart';
 import '../../domain/tarlan_provider.dart';
@@ -9,7 +10,6 @@ import '../error/screen.dart';
 import 'ui/classic/classic_card_input.dart';
 import 'ui/classic/classic_header.dart';
 import 'ui/label.dart';
-import 'ui/light/light_card_input.dart';
 import 'ui/light/light_header.dart';
 
 class PaymentForm extends StatefulWidget {
@@ -37,7 +37,7 @@ class _PaymentFormState extends State<PaymentForm> {
         showModalBottomSheet(
             context: context,
             isScrollControlled: false,
-            isDismissible: false,
+            isDismissible: true,
             builder: (context) => ErrorScreen(
                   errorMessage: provider.error!.message ?? '',
                   mainFormColor: HexColor(provider.colorsInfo.mainFormColor),
@@ -51,27 +51,28 @@ class _PaymentFormState extends State<PaymentForm> {
   }
 
   Widget _buildForm(BuildContext context, TarlanProvider provider) {
-    return Column(
-      children: <Widget>[
-        _buildHeader(provider),
-        const SizedBox(height: Space.l),
-        _buildCardInput(provider),
-        if (provider.showDetails()) _buildRememberCardRow(provider),
-        if (!provider.showDetails()) const SizedBox(height: 24),
-        _buildPayButton(context, provider),
-        const SizedBox(height: 15),
-        _buildCancelButton(context, provider),
-        const SizedBox(height: 10),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(Space.m),
+      child: Column(
+        children: <Widget>[
+          _buildHeader(provider),
+          const SizedBox(height: Space.l),
+          const ClassicCardInput(),
+          if (provider.showDetails()) _buildRememberCardRow(provider),
+          if (!provider.showDetails()) const SizedBox(height: 24),
+          _buildPayButton(context, provider),
+          const SizedBox(height: Space.s),
+          _buildCancelButton(context, provider),
+          const SizedBox(height: Space.l),
+          const LogosRow(),
+          const SizedBox(height: Space.l),
+        ],
+      ),
     );
   }
 
   Widget _buildHeader(TarlanProvider provider) {
     return provider.isClassicTheme() ? const ClassicHeader() : const LightHeader();
-  }
-
-  Widget _buildCardInput(TarlanProvider provider) {
-    return provider.isClassicTheme() ? const ClassicCardInput() : const LightCardInput();
   }
 
   Widget _buildRememberCardRow(TarlanProvider provider) {
@@ -111,11 +112,7 @@ class _PaymentFormState extends State<PaymentForm> {
       ),
       child: ElevatedButton(
         onPressed: () {
-          provider.setCardNumber('4405 6397 0104 2184');
-          provider.setExpiryYear('28');
-          provider.setExpiryMonth('03');
-          provider.setCVV('299');
-          provider.setCardHolderName('ALIKHAN ABKANOV');
+          provider.setMockData();
           provider.setSaveCard(saveChecked);
           provider.makePayment();
         },

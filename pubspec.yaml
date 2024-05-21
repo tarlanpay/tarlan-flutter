@@ -17,6 +17,8 @@ dependencies:
   pretty_http_logger: ^1.0.3
   tarlan_transaction_generator:
     path: ../tarlan_transaction_generator
+  flutter_file_downloader: ^1.2.1
+  share_plus: ^9.0.0
 
 dev_dependencies:
   flutter_test:
@@ -24,6 +26,7 @@ dev_dependencies:
   flutter_lints: ^3.0.0
 
 flutter:
+  uses-material-design: true
   assets:
     - assets/mastercard_logo.png
     - assets/placeholder_logo.png
