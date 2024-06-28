@@ -3,11 +3,7 @@ import 'package:tarlan_payments/data/api_constants.dart';
 import 'package:tarlan_payments/data/model/common/session_data.dart';
 import 'package:tarlan_payments/domain/error_dialog_type.dart';
 import 'package:tarlan_payments/network/api_client.dart';
-import 'package:tarlan_payments/network/environment.dart';
 
-import '../../data/model/pay_in/pay_in_response.dart';
-import '../data/model/receipt/receipt_info.dart';
-import '../network/api_type.dart';
 import '/data/model/common/status.dart';
 import '/data/model/common/type.dart';
 import '/data/model/transaction/colors_info.dart';
@@ -19,6 +15,9 @@ import '/data/webservices/transaction/transaction_webservice.dart';
 import '/domain/flow.dart';
 import '/domain/payment_helper.dart';
 import '/domain/payment_result_route.dart';
+import '../../data/model/pay_in/pay_in_response.dart';
+import '../data/model/receipt/receipt_info.dart';
+import '../network/api_type.dart';
 
 final class TarlanProvider with ChangeNotifier {
   late ColorsInfo colorsInfo;
@@ -227,22 +226,6 @@ final class TarlanProvider with ChangeNotifier {
       paymentHelper.payInPostData.pan = value;
     } else if (type == TarlanType.payOut) {
       paymentHelper.payOutPostData.pan = value;
-    }
-  }
-
-  void setMockData() {
-    if (SessionData().getEnvironment() == Environment.prod) {
-      setCardNumber('4400 4302 7893 5314');
-      setExpiryYear('25');
-      setExpiryMonth('04');
-      setCVV('291');
-      setCardHolderName('TARLAN PROD');
-    } else {
-      setCardNumber('5356502005439678');
-      setExpiryYear('25');
-      setExpiryMonth('04');
-      setCVV('291');
-      setCardHolderName('TARLAN SANDBOX');
     }
   }
 
