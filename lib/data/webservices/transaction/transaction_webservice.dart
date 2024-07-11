@@ -13,6 +13,12 @@ import '../errors.dart';
 class TransactionWebService {
   final api = ApiClient();
 
+  String removeNewLinesAndTrim(String input) {
+    String noNewLines = input.replaceAll(RegExp(r'[\n\r]+'), '');
+    String trimmed = noNewLines.trim();
+    return trimmed;
+  }
+
   Future<TransactionInfo> getTransactionInfo() async {
     UrlData? urlData = SessionData().getUrlData();
     final queryParameters = {
@@ -22,6 +28,15 @@ class TransactionWebService {
     final request = Request(path: ApiConstants.pathTransactionInfo, queryParams: queryParameters);
     try {
       final response = await api.send(request);
+      final csrfHeader = response.headers['x-csrf'];
+      SessionData().setCsrf(csrfHeader);
+      final sessionHeader = response.headers['set-cookie'];
+      if (sessionHeader != null) {
+        final cookies = _parseCookies(sessionHeader)['session'];
+        if (cookies != null) {
+          SessionData().setSession(removeNewLinesAndTrim(cookies));
+        }
+      }
       if (response.statusCode == 200) {
         return transactionInfoResponseFromJson(response.body).result;
       }
@@ -30,6 +45,18 @@ class TransactionWebService {
       throw ErrorsResponse(response: e.toString());
     }
     throw ErrorsResponse(response: 'Unknown');
+  }
+
+  Map<String, String> _parseCookies(String rawCookies) {
+    final cookies = <String, String>{};
+    final cookiePairs = rawCookies.split(';');
+    for (var pair in cookiePairs) {
+      final keyValue = pair.split('=');
+      if (keyValue.length == 2) {
+        cookies[keyValue[0].trim()] = keyValue[1];
+      }
+    }
+    return cookies;
   }
 
   Future<ReceiptInfo> getReceipt() async {

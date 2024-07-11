@@ -1,4 +1,8 @@
+import 'dart:convert';
+
+import 'package:encrypt/encrypt.dart';
 import 'package:flutter/widgets.dart';
+import 'package:pointycastle/asymmetric/api.dart';
 import 'package:tarlan_payments/data/api_constants.dart';
 import 'package:tarlan_payments/data/model/common/session_data.dart';
 import 'package:tarlan_payments/domain/error_dialog_type.dart';
@@ -122,9 +126,32 @@ final class TarlanProvider with ChangeNotifier {
 
   bool isOneClick() => type == TarlanType.oneClickPayIn || type == TarlanType.oneClickPayOut;
 
+  String encryptCardData(String publicKey) {
+    final parser = RSAKeyParser();
+    final publicKey = parser.parse(SessionData().getPublicKey()!) as RSAPublicKey;
+    final encrypter = Encrypter(RSA(publicKey: publicKey, encoding: RSAEncoding.PKCS1));
+
+    final cardData = jsonEncode({
+      'pan': paymentHelper.cardEncryptData.pan,
+      'exp_month': paymentHelper.cardEncryptData.month,
+      'exp_year': paymentHelper.cardEncryptData.year,
+      'cvc': paymentHelper.cardEncryptData.cvc,
+      'full_name': paymentHelper.cardEncryptData.fullName,
+    });
+    final encryptedData = encrypter.encrypt(cardData);
+    return encryptedData.base64;
+  }
+
   Future createTransaction() async {
     isLoading = true;
     notifyListeners();
+
+    if (SessionData().getPublicKey() == null) {
+      final publicKeyResult = await transactionWebService.retrievePublicKey();
+      SessionData().setPublicKey(publicKeyResult);
+    }
+    final publicKey = SessionData().getPublicKey()!;
+    paymentHelper.payInPostData.encryptedCard = encryptCardData(publicKey);
     final paymentResultRoute = await paymentHelper.doTransaction(type, paymentWebService);
     checkPaymentResultRoute(paymentResultRoute);
   }
@@ -222,10 +249,11 @@ final class TarlanProvider with ChangeNotifier {
   }
 
   void setCardNumber(String value) {
+    final pan = value.replaceAll(' ', '');
     if (type == TarlanType.payIn || type == TarlanType.cardLink) {
-      paymentHelper.payInPostData.pan = value;
+      paymentHelper.cardEncryptData.pan = pan;
     } else if (type == TarlanType.payOut) {
-      paymentHelper.payOutPostData.pan = value;
+      paymentHelper.payOutPostData.pan = pan;
     }
   }
 
@@ -241,25 +269,25 @@ final class TarlanProvider with ChangeNotifier {
 
   void setExpiryMonth(String value) {
     if (type == TarlanType.payIn || type == TarlanType.cardLink) {
-      paymentHelper.payInPostData.month = value;
+      paymentHelper.cardEncryptData.month = value;
     }
   }
 
   void setExpiryYear(String value) {
     if (type == TarlanType.payIn || type == TarlanType.cardLink) {
-      paymentHelper.payInPostData.year = value;
+      paymentHelper.cardEncryptData.year = value;
     }
   }
 
   void setCVV(String value) {
     if (type == TarlanType.payIn || type == TarlanType.cardLink) {
-      paymentHelper.payInPostData.cvc = value;
+      paymentHelper.cardEncryptData.cvc = value;
     }
   }
 
   void setCardHolderName(String value) {
     if (type == TarlanType.payIn || type == TarlanType.cardLink) {
-      paymentHelper.payInPostData.fullName = value;
+      paymentHelper.cardEncryptData.fullName = value;
     }
   }
 

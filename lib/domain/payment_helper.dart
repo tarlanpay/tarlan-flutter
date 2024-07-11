@@ -1,14 +1,15 @@
 import 'package:flutter/widgets.dart';
 import 'package:tarlan_payments/data/card_deactivate/card_deactivate_post_data.dart';
+import 'package:tarlan_payments/data/model/common/post_data/card_encrypt_data.dart';
 
-import '../data/model/common/post_data/one_click_post_data.dart';
-import '../data/model/pay_in/pay_in_post_data.dart';
-import '../data/model/pay_in/pay_in_response.dart';
-import '../data/model/pay_out/pay_out_post_data.dart';
 import '/data/model/common/type.dart';
 import '/data/webservices/payment/payment_webservice.dart';
 import '/domain/error_dialog_type.dart';
 import '/domain/payment_result_route.dart';
+import '../data/model/common/post_data/one_click_post_data.dart';
+import '../data/model/pay_in/pay_in_post_data.dart';
+import '../data/model/pay_in/pay_in_response.dart';
+import '../data/model/pay_out/pay_out_post_data.dart';
 
 class PaymentHelper {
   late PayInPostData _payInPostData;
@@ -27,6 +28,10 @@ class PaymentHelper {
 
   CardDeactivatePostData get cardDeactivatePostData => _cardDeactivatePostData;
 
+  late CardEncryptData _cardEncryptData;
+
+  CardEncryptData get cardEncryptData => _cardEncryptData;
+
   TarlanType? type;
 
   PaymentHelper() {
@@ -34,6 +39,7 @@ class PaymentHelper {
     _payOutPostData = PayOutPostData();
     _oneClickPostData = OneClickPostData();
     _cardDeactivatePostData = CardDeactivatePostData();
+    _cardEncryptData = CardEncryptData();
   }
 
   Future<PaymentResultRoute> doTransaction(TarlanType type, PaymentWebService paymentWebService) async {

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:tarlan_payments/data/card_deactivate/card_deactivate_post_data.dart';
 
+import '/network/api_client.dart';
+import '/network/http_method.dart';
 import '../../../network/request.dart';
 import '../../api_constants.dart';
 import '../../model/common/api_response.dart';
@@ -13,8 +15,6 @@ import '../../model/pay_in/pay_in_post_data.dart';
 import '../../model/pay_in/pay_in_response.dart';
 import '../../model/pay_out/pay_out_post_data.dart';
 import '../errors.dart';
-import '/network/api_client.dart';
-import '/network/http_method.dart';
 
 class PaymentWebService {
   final api = ApiClient();
@@ -23,7 +23,6 @@ class PaymentWebService {
     UrlData urlData = SessionData().getUrlData()!;
     postData.transactionId = int.parse(urlData.transactionId);
     postData.transactionHash = urlData.hash;
-    postData.pan = postData.pan?.replaceAll(' ', '');
     postData.save = true;
     final request =
         Request(path: ApiConstants.pathCardLink, body: jsonEncode(postData.toJson()), method: HttpMethod.post);
@@ -59,7 +58,6 @@ class PaymentWebService {
     UrlData urlData = SessionData().getUrlData()!;
     postData.transactionId = int.parse(urlData.transactionId);
     postData.transactionHash = urlData.hash;
-    postData.pan = postData.pan?.replaceAll(' ', '');
     final request = Request(path: ApiConstants.pathPayIn, body: jsonEncode(postData.toJson()), method: HttpMethod.post);
     try {
       final response = await api.send(request);

@@ -125,6 +125,7 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
       textAlign: TextAlign.center,
       focusNode: _cardNumberFocus,
       controller: _controller,
+      autofocus: true,
       cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
       keyboardType: TextInputType.number,
       style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),

@@ -16,6 +16,8 @@ class SessionData {
   String? _projectId;
   UrlData? _urlData;
   String? _publicKey;
+  String? _csrf;
+  String? _session;
   VoidCallback? _onSuccess;
   VoidCallback? _onError;
 
@@ -51,6 +53,14 @@ class SessionData {
     _publicKey = publicKey;
   }
 
+  void setCsrf(String? csrf) {
+    _csrf = csrf;
+  }
+
+  void setSession(String? session) {
+    _session = session;
+  }
+
   String getLanguage() {
     return _language ?? 'ru';
   }
@@ -73,6 +83,14 @@ class SessionData {
 
   String? getPublicKey() {
     return _publicKey;
+  }
+
+  String? getCsrf() {
+    return _csrf;
+  }
+
+  String? getSession() {
+    return _session;
   }
 
   void triggerOnSuccessCallback() {

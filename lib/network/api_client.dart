@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
 import 'package:pretty_http_logger/pretty_http_logger.dart';
+
 import '/network/environment.dart';
 import '/network/http_method.dart';
 import '/network/request.dart';
-
 import '../data/api_constants.dart';
 import '../data/model/common/session_data.dart';
 import 'api_type.dart';
@@ -32,7 +34,14 @@ class ApiClient {
       HttpLogger(logLevel: LogLevel.BODY),
     ]);
     return request.method == HttpMethod.post
-        ? httpWithMiddleware.post(uri, headers: request.httpHeaders, body: request.body)
-        : httpWithMiddleware.get(uri, headers: request.httpHeaders);
+        ? httpWithMiddleware.post(uri, headers: _getHeaders(), body: request.body)
+        : httpWithMiddleware.get(uri, headers: _getHeaders());
   }
+
+  Map<String, String>? _getHeaders() => {
+        HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.contentTypeHeader: 'application/json',
+        'x-csrf': SessionData().getCsrf() ?? "",
+        'Cookie': "session=${SessionData().getSession()}",
+      };
 }
