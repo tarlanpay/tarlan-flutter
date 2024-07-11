@@ -299,4 +299,8 @@ final class TarlanProvider with ChangeNotifier {
       }
     } catch (_) {}
   }
+
+  bool hasPhoneEmail() {
+    return merchantInfo.hasEmail || merchantInfo.hasPhone;
+  }
 }

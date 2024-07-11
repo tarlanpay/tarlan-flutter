@@ -65,28 +65,41 @@ class _PaymentFormState extends State<PaymentForm> {
   }
 
   Widget _buildForm(BuildContext context, TarlanProvider provider) {
-    return Padding(
-      padding: const EdgeInsets.all(Space.m),
-      child: Column(
-        children: <Widget>[
-          _buildHeader(provider),
-          const SizedBox(height: Space.l),
-          const ClassicCardInput(),
-          const SizedBox(height: Space.s),
-          provider.showRememberCardOption() ? _buildRememberCardRow(provider) : const SizedBox(height: Space.s),
-          const SizedBox(height: Space.s),
-          const PhoneEmailInput(),
-          const SizedBox(height: Space.s),
-          if (!provider.showDetails()) const SizedBox(height: 24),
-          _buildPayButton(context, provider),
-          const SizedBox(height: Space.s),
-          _buildCancelButton(context, provider),
-          const SizedBox(height: Space.l),
-          const LogosRow(),
-          const SizedBox(height: Space.l),
-        ],
-      ),
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      return SingleChildScrollView(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: constraints.maxHeight,
+          ),
+          child: IntrinsicHeight(
+            child: Padding(
+              padding: const EdgeInsets.all(Space.m),
+              child: Column(
+                children: <Widget>[
+                  _buildHeader(provider),
+                  const SizedBox(height: Space.l),
+                  const ClassicCardInput(),
+                  const SizedBox(height: Space.s),
+                  provider.showRememberCardOption() ? _buildRememberCardRow(provider) : const SizedBox(height: Space.s),
+                  const SizedBox(height: Space.s),
+                  provider.hasPhoneEmail() ? const PhoneEmailInput() : const SizedBox(),
+                  const SizedBox(height: Space.s),
+                  if (!provider.showDetails()) const SizedBox(height: 24),
+                  _buildPayButton(context, provider),
+                  const SizedBox(height: Space.s),
+                  _buildCancelButton(context, provider),
+                  const SizedBox(height: Space.l),
+                  const LogosRow(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 
   Widget _buildHeader(TarlanProvider provider) {

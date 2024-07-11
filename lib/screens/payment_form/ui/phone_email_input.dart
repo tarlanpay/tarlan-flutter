@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../domain/tarlan_provider.dart';
@@ -14,6 +15,21 @@ class PhoneEmailInput extends StatefulWidget {
 }
 
 class _PhoneEmailState extends State<PhoneEmailInput> {
+  final maskFormatter = MaskTextInputFormatter(
+      mask: '+# (###) ###-##-##', filter: {"#": RegExp(r'[0-9]')}, type: MaskAutoCompletionType.lazy);
+
+  var _emailError = false;
+
+  void validateEmail(String email) {
+    setState(() {
+      String emailRegex =
+          r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+      RegExp regExp = RegExp(emailRegex);
+      _emailError = !regExp.hasMatch(email);
+      if (email.isEmpty) _emailError = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TarlanProvider>(context);
@@ -33,70 +49,120 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Label(
-            title: 'Номер телефона:',
-            hexColor: provider.colorsInfo.inputLabelColor,
-          ),
-          const SizedBox(height: Space.xs),
-          TextField(
-            textAlign: TextAlign.center,
-            keyboardType: TextInputType.phone,
-            cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
-            style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
-            decoration: InputDecoration(
-              fillColor: HexColor(provider.colorsInfo.mainInputColor),
-              filled: true,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5.0),
-                borderSide: const BorderSide(
-                  color: Colors.white,
-                  width: 1.0,
-                ),
-              ),
-              hintText: "+7 (___) ___ - __ - __",
-              hintStyle: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
-              isDense: true,
-              contentPadding: const EdgeInsets.all(5),
-            ),
-            onChanged: (value) {
-              provider.setUserPhone(value);
-            },
-          ),
-          const SizedBox(height: Space.m),
+          provider.merchantInfo.hasPhone ? _buildPhone(provider) : const SizedBox(),
+          provider.merchantInfo.hasEmail ? _buildEmail(provider) : const SizedBox(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmail(TarlanProvider provider) {
+    return Column(
+      children: [
+        Row(children: [
+          provider.merchantInfo.requiredEmail
+              ? const Text(
+                  "*",
+                  style: TextStyle(color: Colors.red),
+                )
+              : const SizedBox(),
           Label(
             title: 'Email:',
             hexColor: provider.colorsInfo.inputLabelColor,
           ),
-          const SizedBox(height: Space.xs),
-          TextField(
-            textAlign: TextAlign.center,
-            keyboardType: TextInputType.emailAddress,
-            cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
-            style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
-            decoration: InputDecoration(
-              fillColor: HexColor(provider.colorsInfo.mainInputColor),
-              filled: true,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5.0),
-                borderSide: const BorderSide(
-                  color: Colors.white,
-                  width: 1.0,
-                ),
+        ]),
+        const SizedBox(height: Space.xs),
+        TextField(
+          textAlign: TextAlign.center,
+          autofocus: true,
+          keyboardType: TextInputType.emailAddress,
+          cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
+          style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
+          decoration: InputDecoration(
+            fillColor: HexColor(provider.colorsInfo.mainInputColor),
+            filled: true,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
+            errorText: _emailError ? "Неверный формат электронного адреса" : null,
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.0),
+              borderSide: const BorderSide(
+                color: Colors.red,
+                width: 2.0,
               ),
-              hintText: "example@email.com",
-              hintStyle: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
-              isDense: true,
-              contentPadding: const EdgeInsets.all(5),
             ),
-            onChanged: (value) {
-              provider.setUserPhone(value);
-            },
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.0),
+              borderSide: const BorderSide(
+                color: Colors.red,
+                width: 1.0,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.0),
+              borderSide: const BorderSide(
+                color: Colors.white,
+                width: 1.0,
+              ),
+            ),
+            hintText: "example@email.com",
+            hintStyle: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
+            isDense: true,
+            contentPadding: const EdgeInsets.all(5),
           ),
-          const SizedBox(height: Space.m),
-        ],
-      ),
+          onChanged: (value) {
+            provider.setUserPhone(value.trim());
+            validateEmail(value.trim());
+          },
+        ),
+        const SizedBox(height: Space.m),
+      ],
+    );
+  }
+
+  Widget _buildPhone(TarlanProvider provider) {
+    return Column(
+      children: [
+        Row(children: [
+          provider.merchantInfo.requiredPhone
+              ? const Text(
+                  "*",
+                  style: TextStyle(color: Colors.red),
+                )
+              : const SizedBox(),
+          Label(
+            title: 'Номер телефона:',
+            hexColor: provider.colorsInfo.inputLabelColor,
+          ),
+        ]),
+        const SizedBox(height: Space.xs),
+        TextField(
+          textAlign: TextAlign.center,
+          keyboardType: TextInputType.phone,
+          inputFormatters: [maskFormatter],
+          cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
+          style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
+          decoration: InputDecoration(
+            fillColor: HexColor(provider.colorsInfo.mainInputColor),
+            filled: true,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.0),
+              borderSide: const BorderSide(
+                color: Colors.white,
+                width: 1.0,
+              ),
+            ),
+            hintText: "+7 (___) ___ - __ - __",
+            hintStyle: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
+            isDense: true,
+            contentPadding: const EdgeInsets.all(5),
+          ),
+          onChanged: (value) {
+            provider.setUserPhone(value);
+          },
+        ),
+        const SizedBox(height: Space.m),
+      ],
     );
   }
 }

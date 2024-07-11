@@ -19,6 +19,7 @@ dependencies:
     path: ../tarlan_transaction_generator
   flutter_file_downloader: ^1.2.1
   share_plus: ^9.0.0
+  mask_text_input_formatter: ^2.9.0
 
 dev_dependencies:
   flutter_test:
