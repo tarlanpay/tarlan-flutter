@@ -20,7 +20,10 @@ class ClassicHeader extends StatelessWidget {
           children: [
             Text(provider.merchantInfo.storeName,
                 style: TextStyle(fontSize: 12, color: HexColor(provider.colorsInfo.mainTextColor))),
-            Text('${provider.transactionInfo.totalAmount.toString()}₸',
+            Text(
+                provider.isCardLink()
+                    ? '${provider.transactionInfo.orderAmount.toString()}₸'
+                    : '${provider.transactionInfo.totalAmount.toString()}₸',
                 style: TextStyle(
                     fontSize: 32,
                     color: HexColor(provider.colorsInfo.secondaryTextColor),
@@ -30,8 +33,10 @@ class ClassicHeader extends StatelessWidget {
                 Text('№${provider.transactionInfo.transactionId.toString()}',
                     style: TextStyle(fontSize: 11, color: HexColor(provider.colorsInfo.mainTextColor))),
                 const SizedBox(width: 20),
-                Text('Комиссия ${provider.transactionInfo.upperCommissionAmount.toString()}KZT',
-                    style: TextStyle(fontSize: 11, color: HexColor(provider.colorsInfo.mainTextColor))),
+                provider.isCardLink()
+                    ? const SizedBox()
+                    : Text('Комиссия ${provider.transactionInfo.upperCommissionAmount.toString()}KZT',
+                        style: TextStyle(fontSize: 11, color: HexColor(provider.colorsInfo.mainTextColor))),
               ],
             )
           ],

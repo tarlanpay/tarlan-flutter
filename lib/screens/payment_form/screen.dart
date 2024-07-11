@@ -155,7 +155,7 @@ class _PaymentFormState extends State<PaymentForm> {
           shadowColor: Colors.transparent,
         ),
         child: Text(
-          'ОПЛАТИТЬ ${provider.transactionInfo.totalAmount.toString()}₸',
+          provider.isCardLink() ? 'ПРИВЯЗАТЬ КАРТУ' : 'ОПЛАТИТЬ ${provider.transactionInfo.totalAmount.toString()}₸',
           style: TextStyle(
             color: HexColor(provider.colorsInfo.mainTextInputColor),
             fontSize: 14,

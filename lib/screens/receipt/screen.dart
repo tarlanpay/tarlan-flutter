@@ -5,12 +5,12 @@ import 'package:share_plus/share_plus.dart';
 import 'package:tarlan_payments/screens/receipt/receipt_design_constants.dart';
 import 'package:tarlan_payments/screens/receipt/receipt_header.dart';
 
-import '../common/logos.dart';
 import '/data/model/common/session_data.dart';
 import '/domain/tarlan_provider.dart';
 import '/screens/receipt/dashed_line_painter.dart';
 import '/utils/hex_color.dart';
 import '/utils/space.dart';
+import '../common/logos.dart';
 
 class Receipt extends StatefulWidget {
   const Receipt({super.key});
@@ -47,7 +47,7 @@ class _ReceiptState extends State<Receipt> {
                 _buildDashedLine(),
                 const SizedBox(height: Space.m),
                 _buildReceiptRow(
-                    context, 'Сумма оплаты', '${provider.receiptInfo.totalAmount}${provider.receiptInfo.currency}'),
+                    context, 'Сумма оплаты', '${provider.receiptInfo.orderAmount}${provider.receiptInfo.currency}'),
                 _buildDashedLine(),
                 const SizedBox(height: Space.m),
                 _buildReceiptRow(context, 'Комиссия',
@@ -62,7 +62,7 @@ class _ReceiptState extends State<Receipt> {
                 const SizedBox(height: Space.m),
                 Center(
                   child: Text(
-                    provider.receiptInfo.projectName,
+                    provider.receiptInfo.paymentOrganization,
                     style: TextStyle(fontSize: 12, color: ReceiptDS.additionalTextColor),
                   ),
                 ),
