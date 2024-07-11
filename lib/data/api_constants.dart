@@ -15,4 +15,5 @@ class ApiConstants {
   static String pathOneClickPayOut = '/transaction/api/v1/transaction/one-click/pay-out';
   static String pathReceipt = '/transaction/api/v1/receipt';
   static String pathReceiptDownload = '/transaction/api/v1/receipt/download';
+  static String pathPublicKey = '/card/api/v1/encryption/public-key';
 }

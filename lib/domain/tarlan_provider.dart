@@ -269,6 +269,18 @@ final class TarlanProvider with ChangeNotifier {
     }
   }
 
+  void setUserPhone(String? phone) {
+    if (type == TarlanType.payIn) {
+      paymentHelper.payInPostData.userPhone = phone;
+    }
+  }
+
+  void setUserEmail(String? email) {
+    if (type == TarlanType.payIn) {
+      paymentHelper.payInPostData.userEmail = email;
+    }
+  }
+
   String receiptPdfUrl() {
     final urlData = SessionData().getUrlData();
     final queryParameters = {'hash': urlData?.hash, 'id': urlData?.transactionId};

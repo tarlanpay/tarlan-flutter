@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tarlan_payments/screens/common/logos.dart';
+import 'package:tarlan_payments/screens/payment_form/ui/phone_email_input.dart';
 import 'package:tarlan_payments/screens/success_dialog/success_dialog.dart';
 
 import '../../data/model/common/session_data.dart';
@@ -71,7 +72,11 @@ class _PaymentFormState extends State<PaymentForm> {
           _buildHeader(provider),
           const SizedBox(height: Space.l),
           const ClassicCardInput(),
+          const SizedBox(height: Space.s),
           provider.showRememberCardOption() ? _buildRememberCardRow(provider) : const SizedBox(height: Space.s),
+          const SizedBox(height: Space.s),
+          const PhoneEmailInput(),
+          const SizedBox(height: Space.s),
           if (!provider.showDetails()) const SizedBox(height: 24),
           _buildPayButton(context, provider),
           const SizedBox(height: Space.s),
@@ -97,14 +102,18 @@ class _PaymentFormState extends State<PaymentForm> {
           hexColor: provider.colorsInfo.mainTextColor,
           fontSize: 14,
         ),
-        Checkbox(
-          activeColor: HexColor(provider.colorsInfo.mainFormColor),
-          onChanged: (newValue) {
-            setState(() {
-              saveChecked = newValue;
-            });
-          },
-          value: saveChecked,
+        SizedBox(
+          width: 20,
+          height: 20,
+          child: Checkbox(
+            activeColor: HexColor(provider.colorsInfo.mainFormColor),
+            onChanged: (newValue) {
+              setState(() {
+                saveChecked = newValue;
+              });
+            },
+            value: saveChecked,
+          ),
         ),
       ],
     );

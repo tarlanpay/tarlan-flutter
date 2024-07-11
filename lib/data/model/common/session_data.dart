@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '/network/environment.dart';
 
+import '/network/environment.dart';
 import 'url_data.dart';
 
 class SessionData {
@@ -15,6 +15,7 @@ class SessionData {
   String? _merchantId;
   String? _projectId;
   UrlData? _urlData;
+  String? _publicKey;
   VoidCallback? _onSuccess;
   VoidCallback? _onError;
 
@@ -46,6 +47,10 @@ class SessionData {
     _projectId = projectId;
   }
 
+  void setPublicKey(String? publicKey) {
+    _publicKey = publicKey;
+  }
+
   String getLanguage() {
     return _language ?? 'ru';
   }
@@ -64,6 +69,10 @@ class SessionData {
 
   String? getProjectId() {
     return _projectId;
+  }
+
+  String? getPublicKey() {
+    return _publicKey;
   }
 
   void triggerOnSuccessCallback() {

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:tarlan_payments/data/model/public_key/public_key_response.dart';
 
 import '../../../network/api_client.dart';
 import '../../../network/request.dart';
@@ -60,6 +61,20 @@ class TransactionWebService {
       final response = await api.send(request);
       if (response.statusCode == 200) {
         return receiptResponseFromJson(response.body).result;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      throw ErrorsResponse(response: e.toString());
+    }
+    throw ErrorsResponse(response: 'Unknown');
+  }
+
+  Future<String> retrievePublicKey() async {
+    final request = Request(path: ApiConstants.pathPublicKey);
+    try {
+      final response = await api.send(request);
+      if (response.statusCode == 200) {
+        return publicKeyResponseFromJson(response.body).result;
       }
     } catch (e) {
       debugPrint(e.toString());

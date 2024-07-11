@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../../../utils/hex_color.dart';
 import '/domain/tarlan_provider.dart';
+import '../../../utils/hex_color.dart';
 import 'label.dart';
 
 class CvvInput extends StatefulWidget {
-  const CvvInput({super.key});
+  final FocusNode focusNode;
+  final FocusNode nextFocusNode;
+
+  const CvvInput({super.key, required this.focusNode, required this.nextFocusNode});
 
   @override
   State<StatefulWidget> createState() => _CvvState();
@@ -32,6 +35,8 @@ class _CvvState extends State<CvvInput> {
             child: TextField(
               controller: _controller,
               textAlign: TextAlign.center,
+              obscureText: true,
+              focusNode: widget.focusNode,
               keyboardType: TextInputType.number,
               cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
               style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
@@ -39,6 +44,13 @@ class _CvvState extends State<CvvInput> {
                 fillColor: HexColor(provider.colorsInfo.mainInputColor),
                 filled: true,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5.0),
+                  borderSide: const BorderSide(
+                    color: Colors.white,
+                    width: 1.0,
+                  ),
+                ),
                 hintStyle: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
                 isDense: true,
                 contentPadding: const EdgeInsets.all(5),
@@ -47,7 +59,10 @@ class _CvvState extends State<CvvInput> {
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(3),
               ],
-              onChanged: ((value) => {provider.setCVV(value)}),
+              onChanged: (value) {
+                provider.setCVV(value);
+                if (value.length == 3) widget.nextFocusNode.requestFocus();
+              },
             ))
       ],
     );

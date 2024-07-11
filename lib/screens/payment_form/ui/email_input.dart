@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '/domain/tarlan_provider.dart';
 import '/utils/hex_color.dart';
-
 import '../../../utils/upper_text.dart';
 import 'label.dart';
 
@@ -29,6 +29,13 @@ class _EmailInputState extends State<EmailInput> {
               fillColor: HexColor('#F4F4F4'),
               filled: true,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.0),
+                borderSide: const BorderSide(
+                  color: Colors.white,
+                  width: 1.0,
+                ),
+              ),
               hintStyle: TextStyle(color: HexColor('#8C8C8C')),
               hintText: "example@email.com",
               isDense: true,

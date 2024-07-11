@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../../../utils/upper_text.dart';
 import '/domain/tarlan_provider.dart';
 import '/utils/hex_color.dart';
+import '../../../utils/upper_text.dart';
 import 'label.dart';
 
 class CardHolderNameInput extends StatefulWidget {
-  const CardHolderNameInput({super.key});
+  final FocusNode focusNode;
+  const CardHolderNameInput({super.key, required this.focusNode});
 
   @override
   State<StatefulWidget> createState() => _CardHolderNameInputState();
@@ -15,6 +17,14 @@ class CardHolderNameInput extends StatefulWidget {
 
 class _CardHolderNameInputState extends State<CardHolderNameInput> {
   final TextEditingController _controller = TextEditingController();
+  bool _hasError = false;
+
+  void _validateInput() {
+    setState(() {
+      _hasError = _controller.text.isEmpty;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TarlanProvider>(context);
@@ -31,17 +41,28 @@ class _CardHolderNameInputState extends State<CardHolderNameInput> {
           child: TextField(
             controller: _controller,
             textAlign: TextAlign.center,
+            focusNode: widget.focusNode,
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')), UpperCaseTextFormatter()],
             cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
             style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
             decoration: InputDecoration(
               fillColor: HexColor(provider.colorsInfo.mainInputColor),
               filled: true,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.0),
+                borderSide: const BorderSide(
+                  color: Colors.white,
+                  width: 1.0,
+                ),
+              ),
               isDense: true,
               contentPadding: const EdgeInsets.all(5),
             ),
-            inputFormatters: [UpperCaseTextFormatter()],
-            onChanged: ((value) => {provider.setCardHolderName(value)}),
+            onChanged: (value) {
+              provider.setCardHolderName(value);
+              _validateInput();
+            },
           ),
         )
       ],

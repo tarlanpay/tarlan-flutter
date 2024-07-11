@@ -28,11 +28,11 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/mastercard_logo.png
+    - assets/mastercard_logo.svg
     - assets/placeholder_logo.png
-    - assets/visa_logo.png
-    - assets/tarlan_logo.png
-    - assets/pci_logo.png
+    - assets/visa_logo.svg
+    - assets/tarlan_logo.svg
+    - assets/pci_logo.svg
     - assets/ic_warning.svg
     - assets/ic_success.svg
     - assets/ic_error.svg

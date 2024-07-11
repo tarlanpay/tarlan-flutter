@@ -18,15 +18,22 @@ class ClassicHeader extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(provider.merchantInfo.storeName ?? '',
-                style: TextStyle(fontSize: 12, color: HexColor(provider.colorsInfo.mainTextColor ?? '#000000'))),
+            Text(provider.merchantInfo.storeName,
+                style: TextStyle(fontSize: 12, color: HexColor(provider.colorsInfo.mainTextColor))),
             Text('${provider.transactionInfo.totalAmount.toString()}₸',
                 style: TextStyle(
                     fontSize: 32,
-                    color: HexColor(provider.colorsInfo.secondaryTextColor ?? '#000000'),
+                    color: HexColor(provider.colorsInfo.secondaryTextColor),
                     fontWeight: FontWeight.bold)),
-            Text('№${provider.transactionInfo.transactionId.toString()}',
-                style: TextStyle(fontSize: 11, color: HexColor(provider.colorsInfo.mainTextColor ?? '#000000'))),
+            Row(
+              children: [
+                Text('№${provider.transactionInfo.transactionId.toString()}',
+                    style: TextStyle(fontSize: 11, color: HexColor(provider.colorsInfo.mainTextColor))),
+                const SizedBox(width: 20),
+                Text('Комиссия ${provider.transactionInfo.upperCommissionAmount.toString()}KZT',
+                    style: TextStyle(fontSize: 11, color: HexColor(provider.colorsInfo.mainTextColor))),
+              ],
+            )
           ],
         ),
       ],

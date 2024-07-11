@@ -24,6 +24,23 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
   late TextEditingController _controller;
   bool _hasError = false;
 
+  final _cardNumberFocus = FocusNode();
+  final _expiryMonthFocus = FocusNode();
+  final _expiryYearFocus = FocusNode();
+  final _cvvFocus = FocusNode();
+  final _cardHolderNameFocus = FocusNode();
+
+  @override
+  void dispose() {
+    _cardNumberFocus.dispose();
+    _expiryMonthFocus.dispose();
+    _expiryYearFocus.dispose();
+    _cvvFocus.dispose();
+    _cardHolderNameFocus.dispose();
+
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -42,8 +59,10 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
 
   void _validateCardNumber(String value) {
     setState(() {
-      // Validate that the card number has 19 characters including spaces
       _hasError = value.length != 19 || !RegExp(r'^\d{4} \d{4} \d{4} \d{4}$').hasMatch(value);
+      if (!_hasError && value.length == 19) {
+        _expiryMonthFocus.requestFocus();
+      }
     });
   }
 
@@ -77,12 +96,24 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
           _buildCardNumberInput(provider, menuItems, cards),
           if (provider.showDetails()) ...[
             const SizedBox(height: Space.m),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [ExpiryInput(), CvvInput()],
+              children: [
+                ExpiryInput(
+                  monthFocusNode: _expiryMonthFocus,
+                  yearFocusNode: _expiryYearFocus,
+                  nextFocusNode: _cvvFocus,
+                ),
+                CvvInput(
+                  focusNode: _cvvFocus,
+                  nextFocusNode: _cardHolderNameFocus,
+                ),
+              ],
             ),
             const SizedBox(height: Space.m),
-            const CardHolderNameInput(),
+            CardHolderNameInput(
+              focusNode: _cardHolderNameFocus,
+            ),
           ],
         ],
       ),
@@ -92,6 +123,7 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
   Widget _buildCardNumberInput(TarlanProvider provider, List<String> menuItems, List<TransactionCard> cards) {
     return TextField(
       textAlign: TextAlign.center,
+      focusNode: _cardNumberFocus,
       controller: _controller,
       cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
       keyboardType: TextInputType.number,
@@ -104,7 +136,28 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
           borderRadius: BorderRadius.circular(5.0),
           borderSide: BorderSide.none,
         ),
-        errorText: _hasError ? 'Неверный номер карты' : null,
+        errorText: _hasError ? 'Такого номера карты не существует' : null,
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(5.0),
+          borderSide: const BorderSide(
+            color: Colors.red,
+            width: 2.0,
+          ),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(5.0),
+          borderSide: const BorderSide(
+            color: Colors.red,
+            width: 1.0,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(5.0),
+          borderSide: const BorderSide(
+            color: Colors.white,
+            width: 1.0,
+          ),
+        ),
         isDense: true,
         contentPadding: const EdgeInsets.all(Space.xs),
         suffixIcon: menuItems.isNotEmpty && !provider.isCardLink()
