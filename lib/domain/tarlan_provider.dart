@@ -43,7 +43,10 @@ final class TarlanProvider with ChangeNotifier {
   ErrorResultRoute? error;
   SuccessDialogResultRoute? success;
 
+  String? emailError;
+
   var disposed = false;
+
   @override
   void dispose() {
     disposed = true;
@@ -182,7 +185,6 @@ final class TarlanProvider with ChangeNotifier {
     if (type == TarlanType.cardLink) {
       _launchSuccessFlow(SuccessDialogResultRoute());
     } else {
-      currentFlow = TarlanFlow.receipt;
       notifyListeners();
       _launchReceipt();
     }
@@ -194,6 +196,19 @@ final class TarlanProvider with ChangeNotifier {
 
   Future<void> _launchReceipt() async {
     try {
+      transactionInfo = await transactionWebService.getTransactionInfo();
+
+      if (transactionInfo.transactionStatus.code != "success") {
+        if (disposed) {
+          return;
+        }
+        error = ErrorResultRoute(type: ErrorDialogType.unsupported, message: transactionInfo.transactionStatus.name);
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      currentFlow = TarlanFlow.receipt;
       receiptInfo = await transactionWebService.getReceipt();
       if (disposed) {
         return;
@@ -307,6 +322,43 @@ final class TarlanProvider with ChangeNotifier {
     if (type == TarlanType.payIn) {
       paymentHelper.payInPostData.userEmail = email;
     }
+  }
+
+  void validateForm() {
+    if (validateEmail() && validatePhone()) {
+      createTransaction();
+    }
+  }
+
+  bool validateEmail() {
+    String email = paymentHelper.payInPostData.userEmail ?? '';
+    if (email.isEmpty && merchantInfo.requiredEmail && merchantInfo.hasEmail) {
+      emailError = "Необходимо указать электронный адрес";
+      notifyListeners();
+      return false;
+    }
+
+    emailError = null;
+    notifyListeners();
+    return true;
+  }
+
+  void clearEmailError() {
+    emailError = null;
+    notifyListeners();
+  }
+
+  bool validatePhone() {
+    String phone = paymentHelper.payInPostData.userPhone ?? '';
+    if (phone.isEmpty && merchantInfo.requiredPhone && merchantInfo.hasPhone) {
+      emailError = "Необходимо указать номер телефона";
+      notifyListeners();
+      return false;
+    }
+
+    emailError = null;
+    notifyListeners();
+    return true;
   }
 
   String receiptPdfUrl() {

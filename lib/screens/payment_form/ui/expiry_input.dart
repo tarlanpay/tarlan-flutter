@@ -30,7 +30,7 @@ class _ExpiryInputState extends State<ExpiryInput> {
   void _validateMonth(String value) {
     setState(() {
       int intValue = int.parse(value);
-      _monthError = intValue > 12 || intValue == 0;
+      _monthError = intValue > 12 && value.length == 2;
       if (!_monthError && value.length == 2) {
         widget.yearFocusNode.requestFocus();
       }
@@ -40,7 +40,7 @@ class _ExpiryInputState extends State<ExpiryInput> {
   void _validateYear(String value) {
     setState(() {
       int currentYear = int.parse(DateTime.now().year.toString().substring(2));
-      _yearError = int.parse(value) < currentYear;
+      _yearError = int.parse(value) < currentYear && value.length == 2;
       if (!_yearError && value.length == 2) {
         widget.nextFocusNode.requestFocus();
       }
@@ -150,7 +150,7 @@ class _ExpiryInputState extends State<ExpiryInput> {
                 "Неверный срок действия карты",
                 style: TextStyle(color: Colors.red[900], fontSize: 11),
               )
-            : SizedBox(),
+            : const SizedBox(),
       ],
     );
   }

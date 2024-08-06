@@ -3,6 +3,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../domain/tarlan_provider.dart';
+import '../../../domain/validators/regex.dart';
 import '../../../utils/hex_color.dart';
 import '../../../utils/space.dart';
 import 'label.dart';
@@ -16,17 +17,20 @@ class PhoneEmailInput extends StatefulWidget {
 
 class _PhoneEmailState extends State<PhoneEmailInput> {
   final maskFormatter = MaskTextInputFormatter(
-      mask: '+# (###) ###-##-##', filter: {"#": RegExp(r'[0-9]')}, type: MaskAutoCompletionType.lazy);
+      mask: '+7 (###) ###-##-##', filter: {"#": RegExp(r'[0-9]')}, type: MaskAutoCompletionType.lazy);
 
-  var _emailError = false;
+  String? _emailError;
 
   void validateEmail(String email) {
     setState(() {
-      String emailRegex =
-          r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-      RegExp regExp = RegExp(emailRegex);
-      _emailError = !regExp.hasMatch(email);
-      if (email.isEmpty) _emailError = false;
+      if (email.isEmpty) {
+        _emailError = null;
+        return;
+      } else if (!Regex.emailRegex.hasMatch(email)) {
+        _emailError = "Неверный формат электронного адреса";
+      } else {
+        _emailError = null;
+      }
     });
   }
 
@@ -82,7 +86,7 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
             fillColor: HexColor(provider.colorsInfo.mainInputColor),
             filled: true,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
-            errorText: _emailError ? "Неверный формат электронного адреса" : null,
+            errorText: _emailError ?? provider.emailError,
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(5.0),
               borderSide: const BorderSide(
@@ -110,8 +114,12 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
             contentPadding: const EdgeInsets.all(5),
           ),
           onChanged: (value) {
-            provider.setUserPhone(value.trim());
-            validateEmail(value.trim());
+            String email = value.trim();
+            provider.setUserEmail(email);
+            if (email.isNotEmpty && provider.emailError?.isNotEmpty == true) {
+              provider.clearEmailError();
+            }
+            validateEmail(email);
           },
         ),
         const SizedBox(height: Space.m),

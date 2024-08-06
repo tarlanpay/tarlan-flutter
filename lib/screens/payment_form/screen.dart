@@ -148,7 +148,7 @@ class _PaymentFormState extends State<PaymentForm> {
       child: ElevatedButton(
         onPressed: () {
           provider.setSaveCard(saveChecked);
-          provider.createTransaction();
+          provider.validateForm();
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,

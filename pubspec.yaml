@@ -23,6 +23,7 @@ dependencies:
   pointycastle: ^3.9.1
   encrypt: ^5.0.3
 
+  crypto: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -59,7 +59,7 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
 
   void _validateCardNumber(String value) {
     setState(() {
-      _hasError = value.length != 19 || !RegExp(r'^\d{4} \d{4} \d{4} \d{4}$').hasMatch(value);
+      _hasError = value.length == 19 && !RegExp(r'^\d{4} \d{4} \d{4} \d{4}$').hasMatch(value);
       if (!_hasError && value.length == 19) {
         _expiryMonthFocus.requestFocus();
       }

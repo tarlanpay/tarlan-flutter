@@ -132,7 +132,6 @@ class _CardPickerState extends State<CardPicker> {
                                           widget.controller.text = '';
                                           widget.provider.switchToRegularPay();
                                           widget.provider.notify();
-                                          Navigator.pop(context);
                                         }
                                         _deletingCards.remove(item);
                                       });

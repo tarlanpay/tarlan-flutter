@@ -42,10 +42,12 @@ class _CardHolderNameInputState extends State<CardHolderNameInput> {
             controller: _controller,
             textAlign: TextAlign.center,
             focusNode: widget.focusNode,
+            maxLength: 23,
             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')), UpperCaseTextFormatter()],
             cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
             style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
             decoration: InputDecoration(
+              counterText: '',
               fillColor: HexColor(provider.colorsInfo.mainInputColor),
               filled: true,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
