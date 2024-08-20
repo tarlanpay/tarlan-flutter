@@ -164,9 +164,27 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
             hintStyle: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
             isDense: true,
             contentPadding: const EdgeInsets.all(5),
+            errorText: provider.phoneError,
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.0),
+              borderSide: const BorderSide(
+                color: Colors.red,
+                width: 2.0,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.0),
+              borderSide: const BorderSide(
+                color: Colors.red,
+                width: 1.0,
+              ),
+            ),
           ),
           onChanged: (value) {
             provider.setUserPhone(value);
+            if (value.isNotEmpty && provider.phoneError?.isNotEmpty == true) {
+              provider.clearPhoneError();
+            }
           },
         ),
         const SizedBox(height: Space.m),

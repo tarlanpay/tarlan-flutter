@@ -36,36 +36,51 @@ class _CardHolderNameInputState extends State<CardHolderNameInput> {
           hexColor: provider.colorsInfo.inputLabelColor,
         ),
         const SizedBox(height: 5),
-        SizedBox(
-          height: 40,
-          child: TextField(
-            controller: _controller,
-            textAlign: TextAlign.center,
-            focusNode: widget.focusNode,
-            maxLength: 23,
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')), UpperCaseTextFormatter()],
-            cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
-            style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
-            decoration: InputDecoration(
-              counterText: '',
-              fillColor: HexColor(provider.colorsInfo.mainInputColor),
-              filled: true,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5.0),
-                borderSide: const BorderSide(
-                  color: Colors.white,
-                  width: 1.0,
-                ),
+        TextField(
+          controller: _controller,
+          textAlign: TextAlign.center,
+          focusNode: widget.focusNode,
+          maxLength: 23,
+          inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')), UpperCaseTextFormatter()],
+          cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
+          style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
+          decoration: InputDecoration(
+            counterText: '',
+            fillColor: HexColor(provider.colorsInfo.mainInputColor),
+            filled: true,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.0),
+              borderSide: const BorderSide(
+                color: Colors.white,
+                width: 1.0,
               ),
-              isDense: true,
-              contentPadding: const EdgeInsets.all(5),
             ),
-            onChanged: (value) {
-              provider.setCardHolderName(value);
-              _validateInput();
-            },
+            errorText: provider.cardHolderError,
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.0),
+              borderSide: const BorderSide(
+                color: Colors.red,
+                width: 2.0,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.0),
+              borderSide: const BorderSide(
+                color: Colors.red,
+                width: 1.0,
+              ),
+            ),
+            isDense: true,
+            contentPadding: const EdgeInsets.all(5),
           ),
+          onChanged: (value) {
+            provider.setCardHolderName(value);
+            _validateInput();
+            if (value.isNotEmpty && provider.paymentHelper.cardEncryptData.fullName?.isNotEmpty == true) {
+              provider.clearCardHolderError();
+            }
+          },
         )
       ],
     );

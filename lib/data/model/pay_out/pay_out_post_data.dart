@@ -8,14 +8,14 @@ class PayOutPostData {
   String? userEmail;
   String? userPhone;
   int? transactionId;
-  String? pan;
+  String? encryptedPan;
   String? transactionHash;
 
   PayOutPostData({
     this.userEmail,
     this.userPhone,
     this.transactionId,
-    this.pan,
+    this.encryptedPan,
     this.transactionHash,
   });
 
@@ -23,7 +23,7 @@ class PayOutPostData {
         userEmail: json["user_email"],
         userPhone: json["user_phone"],
         transactionId: json["transaction_id"],
-        pan: json["pan"],
+        encryptedPan: json["encrypted_pan"],
         transactionHash: json["transaction_hash"],
       );
 
@@ -31,7 +31,7 @@ class PayOutPostData {
         "user_email": userEmail,
         "user_phone": userPhone,
         "transaction_id": transactionId,
-        "pan": pan,
+        "encrypted_pan": encryptedPan,
         "transaction_hash": transactionHash,
       };
 }

@@ -128,10 +128,12 @@ class _CardPickerState extends State<CardPicker> {
                                       widget.provider.deactivateCard(card.cardToken);
                                       setState(() {
                                         widget.cards.remove(card);
+                                        widget.menuItems.remove(card.maskedPan);
                                         if (widget.cards.isEmpty) {
                                           widget.controller.text = '';
                                           widget.provider.switchToRegularPay();
                                           widget.provider.notify();
+                                          Navigator.pop(context);
                                         }
                                         _deletingCards.remove(item);
                                       });

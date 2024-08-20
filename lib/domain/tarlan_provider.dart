@@ -6,6 +6,7 @@ import 'package:pointycastle/asymmetric/api.dart';
 import 'package:tarlan_payments/data/api_constants.dart';
 import 'package:tarlan_payments/data/model/common/session_data.dart';
 import 'package:tarlan_payments/domain/error_dialog_type.dart';
+import 'package:tarlan_payments/domain/validators/regex.dart';
 import 'package:tarlan_payments/network/api_client.dart';
 
 import '/data/model/common/status.dart';
@@ -44,6 +45,11 @@ final class TarlanProvider with ChangeNotifier {
   SuccessDialogResultRoute? success;
 
   String? emailError;
+  String? cardError;
+  String? expiryError;
+  String? cvvError;
+  String? cardHolderError;
+  String? phoneError;
 
   var disposed = false;
 
@@ -134,13 +140,22 @@ final class TarlanProvider with ChangeNotifier {
     final publicKey = parser.parse(SessionData().getPublicKey()!) as RSAPublicKey;
     final encrypter = Encrypter(RSA(publicKey: publicKey, encoding: RSAEncoding.PKCS1));
 
-    final cardData = jsonEncode({
-      'pan': paymentHelper.cardEncryptData.pan,
-      'exp_month': paymentHelper.cardEncryptData.month,
-      'exp_year': paymentHelper.cardEncryptData.year,
-      'cvc': paymentHelper.cardEncryptData.cvc,
-      'full_name': paymentHelper.cardEncryptData.fullName,
-    });
+    String cardData;
+
+    if (type == TarlanType.payOut) {
+      cardData = jsonEncode({
+        'pan': paymentHelper.cardEncryptData.pan,
+      });
+    } else {
+      cardData = jsonEncode({
+        'pan': paymentHelper.cardEncryptData.pan,
+        'exp_month': paymentHelper.cardEncryptData.month,
+        'exp_year': paymentHelper.cardEncryptData.year,
+        'cvc': paymentHelper.cardEncryptData.cvc,
+        'full_name': paymentHelper.cardEncryptData.fullName,
+      });
+    }
+
     final encryptedData = encrypter.encrypt(cardData);
     return encryptedData.base64;
   }
@@ -154,7 +169,11 @@ final class TarlanProvider with ChangeNotifier {
       SessionData().setPublicKey(publicKeyResult);
     }
     final publicKey = SessionData().getPublicKey()!;
-    paymentHelper.payInPostData.encryptedCard = encryptCardData(publicKey);
+    if (type == TarlanType.payOut) {
+      paymentHelper.payOutPostData.encryptedPan = encryptCardData(publicKey);
+    } else {
+      paymentHelper.payInPostData.encryptedCard = encryptCardData(publicKey);
+    }
     final paymentResultRoute = await paymentHelper.doTransaction(type, paymentWebService);
     checkPaymentResultRoute(paymentResultRoute);
   }
@@ -174,7 +193,7 @@ final class TarlanProvider with ChangeNotifier {
   }
 
   void _launch3DS(ThreeDs data) {
-    print("Launching 3DS: ${data.toJson()}");
+    debugPrint("Launching 3DS: ${data.toJson()}");
     threeDs = data;
     currentFlow = TarlanFlow.threeDs;
     notifyListeners();
@@ -183,7 +202,7 @@ final class TarlanProvider with ChangeNotifier {
   void threeDsFinished() {
     isLoading = true;
     if (type == TarlanType.cardLink) {
-      _launchSuccessFlow(SuccessDialogResultRoute());
+      _verifyCardLink();
     } else {
       notifyListeners();
       _launchReceipt();
@@ -192,6 +211,30 @@ final class TarlanProvider with ChangeNotifier {
 
   void _launchFingerprint(Fingerprint fingerprint) {
     isLoading = false;
+  }
+
+  Future<void> _verifyCardLink() async {
+    try {
+      transactionInfo = await transactionWebService.getTransactionInfo();
+
+      if (transactionInfo.transactionStatus.code != "success") {
+        if (disposed) {
+          return;
+        }
+        error = ErrorResultRoute(type: ErrorDialogType.unsupported, message: transactionInfo.transactionStatus.name);
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
+      _launchSuccessFlow(SuccessDialogResultRoute());
+    } catch (_) {
+      if (disposed) {
+        return;
+      }
+      error = ErrorResultRoute(type: ErrorDialogType.unsupported, message: 'Unknown');
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> _launchReceipt() async {
@@ -265,11 +308,7 @@ final class TarlanProvider with ChangeNotifier {
 
   void setCardNumber(String value) {
     final pan = value.replaceAll(' ', '');
-    if (type == TarlanType.payIn || type == TarlanType.cardLink) {
-      paymentHelper.cardEncryptData.pan = pan;
-    } else if (type == TarlanType.payOut) {
-      paymentHelper.payOutPostData.pan = pan;
-    }
+    paymentHelper.cardEncryptData.pan = pan;
   }
 
   void notify() {
@@ -313,32 +352,178 @@ final class TarlanProvider with ChangeNotifier {
   }
 
   void setUserPhone(String? phone) {
-    if (type == TarlanType.payIn) {
-      paymentHelper.payInPostData.userPhone = phone;
+    switch (type) {
+      case TarlanType.cardLink:
+        paymentHelper.payInPostData.userPhone = phone;
+      case TarlanType.payIn:
+        paymentHelper.payInPostData.userPhone = phone;
+      case TarlanType.payOut:
+        paymentHelper.payOutPostData.userPhone = phone;
+      case TarlanType.oneClickPayIn:
+        paymentHelper.oneClickPostData.userPhone = phone;
+      case TarlanType.oneClickPayOut:
+        paymentHelper.oneClickPostData.userPhone = phone;
+      case TarlanType.unsupported:
+        paymentHelper.payInPostData.userPhone = phone;
     }
   }
 
   void setUserEmail(String? email) {
-    if (type == TarlanType.payIn) {
-      paymentHelper.payInPostData.userEmail = email;
+    switch (type) {
+      case TarlanType.cardLink:
+        paymentHelper.payInPostData.userEmail = email;
+      case TarlanType.payIn:
+        paymentHelper.payInPostData.userEmail = email;
+      case TarlanType.payOut:
+        paymentHelper.payOutPostData.userEmail = email;
+      case TarlanType.oneClickPayIn:
+        paymentHelper.oneClickPostData.userEmail = email;
+      case TarlanType.oneClickPayOut:
+        paymentHelper.oneClickPostData.userEmail = email;
+      case TarlanType.unsupported:
+        paymentHelper.payInPostData.userEmail = email;
     }
   }
 
   void validateForm() {
-    if (validateEmail() && validatePhone()) {
+    if (validateCard() &&
+        validateExpiry() &&
+        validateCvv() &&
+        validateCardholder() &&
+        validatePhone() &&
+        validateEmail()) {
       createTransaction();
     }
   }
 
+  bool validateCard() {
+    if (type == TarlanType.oneClickPayIn || type == TarlanType.oneClickPayOut) {
+      return true;
+    }
+    String card = paymentHelper.cardEncryptData.pan ?? '';
+    if (card.isEmpty) {
+      cardError = "Необходимо указать номер карты";
+      notifyListeners();
+      return false;
+    }
+
+    if (card.length != 16) {
+      cardError = "Номер карты указан неверно";
+      notifyListeners();
+      return false;
+    }
+
+    cardError = null;
+    notifyListeners();
+    return true;
+  }
+
+  bool validateExpiry() {
+    if (type != TarlanType.payIn && type != TarlanType.cardLink) {
+      return true;
+    }
+    String month = paymentHelper.cardEncryptData.month ?? '';
+    String year = paymentHelper.cardEncryptData.year ?? '';
+    if (month.isEmpty || year.isEmpty) {
+      expiryError = "Укажите срок действия карты";
+      notifyListeners();
+      return false;
+    }
+
+    expiryError = null;
+    notifyListeners();
+    return true;
+  }
+
+  bool validateCvv() {
+    if (type != TarlanType.payIn && type != TarlanType.cardLink) {
+      return true;
+    }
+    String cvv = paymentHelper.cardEncryptData.cvc ?? '';
+    if (cvv.isEmpty) {
+      cvvError = "Укажите CVV";
+      notifyListeners();
+      return false;
+    }
+
+    cvvError = null;
+    notifyListeners();
+    return true;
+  }
+
+  bool validateCardholder() {
+    if (type != TarlanType.payIn && type != TarlanType.cardLink) {
+      return true;
+    }
+    String name = paymentHelper.cardEncryptData.fullName ?? '';
+    if (name.isEmpty) {
+      cardHolderError = "Необходимо указать имя держателя карты";
+      notifyListeners();
+      return false;
+    }
+
+    cardHolderError = null;
+    notifyListeners();
+    return true;
+  }
+
   bool validateEmail() {
-    String email = paymentHelper.payInPostData.userEmail ?? '';
+    String email;
+    switch (type) {
+      case TarlanType.cardLink:
+        email = paymentHelper.payInPostData.userEmail ?? '';
+      case TarlanType.payIn:
+        email = paymentHelper.payInPostData.userEmail ?? '';
+      case TarlanType.payOut:
+        email = paymentHelper.payOutPostData.userEmail ?? '';
+      case TarlanType.oneClickPayIn:
+        email = paymentHelper.oneClickPostData.userEmail ?? '';
+      case TarlanType.oneClickPayOut:
+        email = paymentHelper.oneClickPostData.userEmail ?? '';
+      case TarlanType.unsupported:
+        email = paymentHelper.payInPostData.userEmail ?? '';
+    }
+
     if (email.isEmpty && merchantInfo.requiredEmail && merchantInfo.hasEmail) {
       emailError = "Необходимо указать электронный адрес";
       notifyListeners();
       return false;
     }
 
+    if (!Regex.emailRegex.hasMatch(email)) {
+      emailError = "Неверный формат электронного адреса";
+      notifyListeners();
+      return false;
+    }
+
     emailError = null;
+    notifyListeners();
+    return true;
+  }
+
+  bool validatePhone() {
+    String phone;
+    switch (type) {
+      case TarlanType.cardLink:
+        phone = paymentHelper.payInPostData.userPhone ?? '';
+      case TarlanType.payIn:
+        phone = paymentHelper.payInPostData.userPhone ?? '';
+      case TarlanType.payOut:
+        phone = paymentHelper.payOutPostData.userPhone ?? '';
+      case TarlanType.oneClickPayIn:
+        phone = paymentHelper.oneClickPostData.userPhone ?? '';
+      case TarlanType.oneClickPayOut:
+        phone = paymentHelper.oneClickPostData.userPhone ?? '';
+      case TarlanType.unsupported:
+        phone = paymentHelper.payInPostData.userPhone ?? '';
+    }
+    if (phone.isEmpty && merchantInfo.requiredPhone && merchantInfo.hasPhone) {
+      phoneError = "Необходимо указать номер телефона";
+      notifyListeners();
+      return false;
+    }
+
+    phoneError = null;
     notifyListeners();
     return true;
   }
@@ -348,17 +533,29 @@ final class TarlanProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  bool validatePhone() {
-    String phone = paymentHelper.payInPostData.userPhone ?? '';
-    if (phone.isEmpty && merchantInfo.requiredPhone && merchantInfo.hasPhone) {
-      emailError = "Необходимо указать номер телефона";
-      notifyListeners();
-      return false;
-    }
-
-    emailError = null;
+  void clearPhoneError() {
+    phoneError = null;
     notifyListeners();
-    return true;
+  }
+
+  void clearCardError() {
+    cardError = null;
+    notifyListeners();
+  }
+
+  void clearExpiryError() {
+    expiryError = null;
+    notifyListeners();
+  }
+
+  void clearCvvError() {
+    cvvError = null;
+    notifyListeners();
+  }
+
+  void clearCardHolderError() {
+    cardHolderError = null;
+    notifyListeners();
   }
 
   String receiptPdfUrl() {

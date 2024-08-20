@@ -22,7 +22,7 @@ class ClassicCardInput extends StatefulWidget {
 
 class _ClassicCardInputState extends State<ClassicCardInput> {
   late TextEditingController _controller;
-  bool _hasError = false;
+  String? _localError;
 
   final _cardNumberFocus = FocusNode();
   final _expiryMonthFocus = FocusNode();
@@ -59,11 +59,43 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
 
   void _validateCardNumber(String value) {
     setState(() {
-      _hasError = value.length == 19 && !RegExp(r'^\d{4} \d{4} \d{4} \d{4}$').hasMatch(value);
-      if (!_hasError && value.length == 19) {
+      bool isFilled = value.length == 19;
+      if (isFilled) {
+        bool basicValidation = RegExp(r'^\d{4} \d{4} \d{4} \d{4}$').hasMatch(value);
+        bool luhnValidity = checkLuhnValidity(value.replaceAll(" ", ''));
+        if (!basicValidation || !luhnValidity) {
+          _localError = 'Такой карты не существует';
+        } else {
+          _localError = null;
+        }
+      }
+
+      if (_localError == null && isFilled) {
         _expiryMonthFocus.requestFocus();
       }
     });
+  }
+
+  bool checkLuhnValidity(String ccNum) {
+    int sum = 0;
+    bool alternate = false;
+
+    for (int i = ccNum.length - 1; i >= 0; i--) {
+      int digit = int.parse(ccNum[i]);
+
+      if (alternate) {
+        digit *= 2;
+        if (digit > 9) {
+          digit = (digit % 10) + 1;
+        }
+      }
+
+      sum += digit;
+
+      alternate = !alternate;
+    }
+
+    return sum % 10 == 0;
   }
 
   @override
@@ -137,7 +169,7 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
           borderRadius: BorderRadius.circular(5.0),
           borderSide: BorderSide.none,
         ),
-        errorText: _hasError ? 'Такого номера карты не существует' : null,
+        errorText: _localError ?? provider.cardError,
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5.0),
           borderSide: const BorderSide(
@@ -175,7 +207,11 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
       ],
       onChanged: (value) {
         provider.setCardNumber(value.trim());
-        _validateCardNumber(value.trim());
+        if (value.isNotEmpty && provider.paymentHelper.cardEncryptData.pan?.isNotEmpty == true) {
+          provider.clearCardError();
+          _localError = null;
+        }
+        _validateCardNumber(value);
       },
     );
   }

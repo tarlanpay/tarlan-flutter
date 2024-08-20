@@ -30,40 +30,50 @@ class _CvvState extends State<CvvInput> {
         ),
         const SizedBox(height: 5),
         SizedBox(
-            width: 70,
-            height: 40,
-            child: TextField(
-              controller: _controller,
-              textAlign: TextAlign.center,
-              obscureText: true,
-              focusNode: widget.focusNode,
-              keyboardType: TextInputType.number,
-              cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
-              style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
-              decoration: InputDecoration(
-                fillColor: HexColor(provider.colorsInfo.mainInputColor),
-                filled: true,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                  borderSide: const BorderSide(
-                    color: Colors.white,
-                    width: 1.0,
-                  ),
+          width: 70,
+          height: 40,
+          child: TextField(
+            controller: _controller,
+            textAlign: TextAlign.center,
+            obscureText: true,
+            focusNode: widget.focusNode,
+            keyboardType: TextInputType.number,
+            cursorColor: HexColor(provider.colorsInfo.mainTextInputColor),
+            style: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
+            decoration: InputDecoration(
+              fillColor: HexColor(provider.colorsInfo.mainInputColor),
+              filled: true,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.0),
+                borderSide: const BorderSide(
+                  color: Colors.white,
+                  width: 1.0,
                 ),
-                hintStyle: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
-                isDense: true,
-                contentPadding: const EdgeInsets.all(5),
               ),
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(3),
-              ],
-              onChanged: (value) {
-                provider.setCVV(value);
-                if (value.length == 3) widget.nextFocusNode.requestFocus();
-              },
-            ))
+              hintStyle: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
+              isDense: true,
+              contentPadding: const EdgeInsets.all(5),
+            ),
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(3),
+            ],
+            onChanged: (value) {
+              provider.setCVV(value);
+              if (value.isNotEmpty && provider.paymentHelper.cardEncryptData.cvc?.isNotEmpty == true) {
+                provider.clearCvvError();
+              }
+              if (value.length == 3) widget.nextFocusNode.requestFocus();
+            },
+          ),
+        ),
+        provider.cvvError?.isNotEmpty == true
+            ? Text(
+                provider.cvvError ?? "Неверный CVV",
+                style: TextStyle(color: Colors.red[900], fontSize: 11),
+              )
+            : const SizedBox(),
       ],
     );
   }

@@ -74,7 +74,6 @@ class PaymentWebService {
     UrlData urlData = SessionData().getUrlData()!;
     postData.transactionId = int.parse(urlData.transactionId);
     postData.transactionHash = urlData.hash;
-    postData.pan = postData.pan?.replaceAll(' ', '');
     final request =
         Request(path: ApiConstants.pathPayOut, body: jsonEncode(postData.toJson()), method: HttpMethod.post);
     try {

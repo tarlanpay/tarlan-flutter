@@ -99,6 +99,9 @@ class _ExpiryInputState extends State<ExpiryInput> {
                   onChanged: (value) {
                     provider.setExpiryMonth(value);
                     _validateMonth(value);
+                    if (value.isNotEmpty && provider.paymentHelper.cardEncryptData.month?.isNotEmpty == true) {
+                      provider.clearExpiryError();
+                    }
                   },
                 )),
             const SizedBox(width: 16),
@@ -141,13 +144,16 @@ class _ExpiryInputState extends State<ExpiryInput> {
                   onChanged: (value) {
                     provider.setExpiryYear(value);
                     _validateYear(value);
+                    if (value.isNotEmpty && provider.paymentHelper.cardEncryptData.year?.isNotEmpty == true) {
+                      provider.clearExpiryError();
+                    }
                   },
                 ))
           ],
         ),
-        _yearError || _monthError
+        _yearError || _monthError || provider.expiryError?.isNotEmpty == true
             ? Text(
-                "Неверный срок действия карты",
+                provider.expiryError ?? "Неверный срок действия карты",
                 style: TextStyle(color: Colors.red[900], fontSize: 11),
               )
             : const SizedBox(),
