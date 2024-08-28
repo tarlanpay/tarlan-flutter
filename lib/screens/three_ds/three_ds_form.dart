@@ -5,11 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 
+import '/domain/tarlan_provider.dart';
 import '../../data/model/common/session_data.dart';
 import '../../utils/hex_color.dart';
 import '../error/screen.dart';
-import '../success_dialog/success_dialog.dart';
-import '/domain/tarlan_provider.dart';
 
 class ThreeDSForm extends StatefulWidget {
   const ThreeDSForm({super.key});
@@ -74,18 +73,6 @@ class _ThreeDSFormState extends State<ThreeDSForm> {
                 )).whenComplete(() {
           provider.clearError();
           SessionData().triggerOnErrorCallback();
-          Navigator.of(context).pop(); // Example: clear the error in the provider
-        });
-      } else if (provider.success != null) {
-        showModalBottomSheet(
-            context: context,
-            isScrollControlled: false,
-            isDismissible: true,
-            builder: (context) => SuccessScreen(
-                  mainFormColor: HexColor(provider.colorsInfo.mainFormColor),
-                )).whenComplete(() {
-          provider.clearSuccess();
-          SessionData().triggerOnSuccessCallback();
           Navigator.of(context).pop(); // Example: clear the error in the provider
         });
       }

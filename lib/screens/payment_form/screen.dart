@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tarlan_payments/screens/common/logos.dart';
 import 'package:tarlan_payments/screens/payment_form/ui/phone_email_input.dart';
-import 'package:tarlan_payments/screens/success_dialog/success_dialog.dart';
 
 import '../../data/model/common/session_data.dart';
 import '../../domain/tarlan_provider.dart';
@@ -46,18 +45,6 @@ class _PaymentFormState extends State<PaymentForm> {
                 )).whenComplete(() {
           provider.clearError();
           SessionData().triggerOnErrorCallback();
-          Navigator.of(context).pop(); // Example: clear the error in the provider
-        });
-      } else if (provider.success != null) {
-        showModalBottomSheet(
-            context: context,
-            isScrollControlled: false,
-            isDismissible: true,
-            builder: (context) => SuccessScreen(
-                  mainFormColor: HexColor(provider.colorsInfo.mainFormColor),
-                )).whenComplete(() {
-          provider.clearSuccess();
-          SessionData().triggerOnSuccessCallback();
           Navigator.of(context).pop(); // Example: clear the error in the provider
         });
       }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tarlan_payments/screens/success/success_screen.dart';
+
 import '/domain/tarlan_provider.dart';
 import '/screens/receipt/screen.dart';
 import '/screens/three_ds/three_ds_form.dart';
-
 import '../domain/flow.dart';
+import '../utils/hex_color.dart';
 import 'payment_form/screen.dart';
 
 class TarlanParentWidget extends StatelessWidget {
@@ -37,6 +39,8 @@ class TarlanMainWidget extends StatelessWidget {
         return const ThreeDSForm();
       case TarlanFlow.receipt:
         return const Receipt();
+      case TarlanFlow.success:
+        return SuccessScreen(mainFormColor: HexColor(provider.colorsInfo.mainFormColor));
     }
   }
 }

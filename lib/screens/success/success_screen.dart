@@ -16,7 +16,7 @@ class SuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(Space.m),
+      padding: const EdgeInsets.symmetric(vertical: Space.xxl, horizontal: Space.m),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,

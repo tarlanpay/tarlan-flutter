@@ -1,1 +1,1 @@
-enum TarlanFlow { form, receipt, threeDs }
+enum TarlanFlow { form, receipt, threeDs, success }

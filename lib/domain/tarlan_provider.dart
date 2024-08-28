@@ -42,7 +42,6 @@ final class TarlanProvider with ChangeNotifier {
   var isLoading = true;
   var currentFlow = TarlanFlow.form;
   ErrorResultRoute? error;
-  SuccessDialogResultRoute? success;
 
   String? emailError;
   String? cardError;
@@ -277,17 +276,12 @@ final class TarlanProvider with ChangeNotifier {
 
   void _launchSuccessFlow(SuccessDialogResultRoute route) {
     isLoading = false;
-    success = route;
+    currentFlow = TarlanFlow.success;
     notifyListeners();
   }
 
   void clearError() {
     error = null;
-    notifyListeners();
-  }
-
-  void clearSuccess() {
-    success = null;
     notifyListeners();
   }
 
@@ -299,7 +293,7 @@ final class TarlanProvider with ChangeNotifier {
   }
 
   bool showRememberCardOption() {
-    return type == TarlanType.payIn || type == TarlanType.payOut;
+    return type == TarlanType.payIn;
   }
 
   bool isCardLink() {
@@ -490,7 +484,7 @@ final class TarlanProvider with ChangeNotifier {
       return false;
     }
 
-    if (!Regex.emailRegex.hasMatch(email)) {
+    if (!Regex.emailRegex.hasMatch(email) && email.isNotEmpty) {
       emailError = "Неверный формат электронного адреса";
       notifyListeners();
       return false;
@@ -519,6 +513,12 @@ final class TarlanProvider with ChangeNotifier {
     }
     if (phone.isEmpty && merchantInfo.requiredPhone && merchantInfo.hasPhone) {
       phoneError = "Необходимо указать номер телефона";
+      notifyListeners();
+      return false;
+    }
+
+    if (phone.length != 18 && phone.isNotEmpty) {
+      phoneError = "Номер телефона указан не полностью";
       notifyListeners();
       return false;
     }
@@ -560,7 +560,7 @@ final class TarlanProvider with ChangeNotifier {
 
   String receiptPdfUrl() {
     final urlData = SessionData().getUrlData();
-    final queryParameters = {'hash': urlData?.hash, 'id': urlData?.transactionId};
+    final queryParameters = {'hash': urlData?.hash, 'id': urlData?.transactionId, 'locale': 'ru'};
     final uri = Uri.https(ApiClient().baseUrl(ApiType.main), ApiConstants.pathReceiptDownload, queryParameters);
     return uri.toString();
   }
