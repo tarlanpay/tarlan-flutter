@@ -73,13 +73,19 @@ final class TarlanProvider with ChangeNotifier {
       type = TarlanType.fromTransactionInfo(transactionInfo);
       status = TarlanStatus.fromTransactionInfo(transactionInfo);
 
-      checkForOneClick();
+      if (goToReceipt()) {
+        _launchReceipt();
+      } else if (goToCardLinkResult()) {
+        _launchSuccessFlow(SuccessDialogResultRoute());
+      } else {
+        checkForOneClick();
 
-      if (disposed) {
-        return;
+        if (disposed) {
+          return;
+        }
+        isLoading = false;
+        notifyListeners();
       }
-      isLoading = false;
-      notifyListeners();
     } catch (_) {
       if (disposed) {
         return;
