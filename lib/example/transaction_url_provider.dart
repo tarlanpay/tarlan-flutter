@@ -68,7 +68,7 @@ class TransactionUrlProvider extends ChangeNotifier {
 
   String randomReferenceId(String input) {
     final parts = input.split('-');
-    final numericPart = Random().nextInt(900) + 100;
+    final numericPart = Random().nextInt(9000) + 1000;
     return '${parts.sublist(0, parts.length - 1).join('-')}-$numericPart';
   }
 

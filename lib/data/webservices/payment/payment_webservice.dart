@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 import 'package:tarlan_payments/data/card_deactivate/card_deactivate_post_data.dart';
+import 'package:tarlan_payments/data/model/common/post_data/resume_post_data.dart';
 
 import '/network/api_client.dart';
 import '/network/http_method.dart';
@@ -115,6 +116,28 @@ class PaymentWebService {
       final response = await api.send(request);
       if (response.statusCode == 200) {
         return response.body;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      throw ErrorsResponse(response: e.toString());
+    }
+    throw ErrorsResponse(response: 'Unknown');
+  }
+
+  Future<ApiResponse<PayInResult>> resume() async {
+    UrlData urlData = SessionData().getUrlData()!;
+    ResumePostData postData = ResumePostData();
+    postData.transactionId = int.parse(urlData.transactionId);
+    postData.transactionHash = urlData.hash;
+    final request =
+        Request(path: ApiConstants.pathResume, body: jsonEncode(postData.toJson()), method: HttpMethod.post);
+    try {
+      final response = await api.send(request);
+      if (response.statusCode == 200) {
+        return ApiResponse<PayInResult>.fromJson(
+          jsonDecode(response.body),
+          (json) => PayInResult.fromJson(json),
+        );
       }
     } catch (e) {
       debugPrint(e.toString());

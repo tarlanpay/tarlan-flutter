@@ -32,6 +32,7 @@ final class TarlanProvider with ChangeNotifier {
   late TarlanType type;
   late TarlanStatus status;
   late ThreeDs threeDs;
+  late Fingerprint fingerprint;
 
   MerchantWebService merchantWebService = MerchantWebService();
   TransactionWebService transactionWebService = TransactionWebService();
@@ -214,8 +215,28 @@ final class TarlanProvider with ChangeNotifier {
     }
   }
 
-  void _launchFingerprint(Fingerprint fingerprint) {
-    isLoading = false;
+  void _launchFingerprint(Fingerprint data) {
+    fingerprint = data;
+    resumeFingerprint();
+  }
+
+  Future<void> resumeFingerprint() async {
+    try {
+      var resumeResult = await paymentWebService.resume();
+      var resultRoute = await paymentHelper.checkResult(resumeResult.result);
+      checkPaymentResultRoute(resultRoute);
+      if (disposed) {
+        return;
+      }
+      isLoading = false;
+    } catch (_) {
+      if (disposed) {
+        return;
+      }
+      error = ErrorResultRoute(type: ErrorDialogType.unsupported, message: 'Unknown');
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> _verifyCardLink() async {
