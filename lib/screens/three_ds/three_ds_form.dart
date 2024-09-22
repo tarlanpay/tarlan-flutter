@@ -6,9 +6,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 
 import '/domain/tarlan_provider.dart';
-import '../../data/model/common/session_data.dart';
-import '../../utils/hex_color.dart';
-import '../error/screen.dart';
 
 class ThreeDSForm extends StatefulWidget {
   const ThreeDSForm({super.key});
@@ -29,7 +26,6 @@ class _ThreeDSFormState extends State<ThreeDSForm> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TarlanProvider>(context);
-    _showModalIfNeeded(context, provider);
     final data = provider.threeDs;
 
     String buildHiddenInputs() {
@@ -58,24 +54,5 @@ class _ThreeDSFormState extends State<ThreeDSForm> {
         },
       ),
     );
-  }
-
-  void _showModalIfNeeded(BuildContext context, TarlanProvider provider) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (provider.error != null) {
-        showModalBottomSheet(
-            context: context,
-            isScrollControlled: false,
-            isDismissible: true,
-            builder: (context) => ErrorScreen(
-                  errorMessage: provider.error!.message ?? '',
-                  mainFormColor: HexColor(provider.colorsInfo.mainFormColor),
-                )).whenComplete(() {
-          provider.clearError();
-          SessionData().triggerOnErrorCallback();
-          Navigator.of(context).pop(); // Example: clear the error in the provider
-        });
-      }
-    });
   }
 }

@@ -47,7 +47,8 @@ class TarlanMainWidget extends StatelessWidget {
         return SuccessScreen(mainFormColor: HexColor(provider.colorsInfo.mainFormColor));
       case TarlanFlow.error:
         return ErrorScreen(
-            errorMessage: provider.error?.message, mainFormColor: HexColor(provider.colorsInfo.mainFormColor));
+            errorMessage: provider.error?.message ?? 'Unexpected error',
+            mainFormColor: HexColor(provider.colorsInfo.mainFormColor));
     }
   }
 }

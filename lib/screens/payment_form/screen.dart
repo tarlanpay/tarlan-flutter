@@ -7,7 +7,6 @@ import '../../data/model/common/session_data.dart';
 import '../../domain/tarlan_provider.dart';
 import '../../utils/hex_color.dart';
 import '../../utils/space.dart';
-import '../error/screen.dart';
 import 'ui/classic/classic_card_input.dart';
 import 'ui/classic/classic_header.dart';
 import 'ui/label.dart';
@@ -26,29 +25,7 @@ class _PaymentFormState extends State<PaymentForm> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TarlanProvider>(context);
-
-    _showModalIfNeeded(context, provider);
-
     return provider.isLoading ? const Center(child: CircularProgressIndicator()) : _buildForm(context, provider);
-  }
-
-  void _showModalIfNeeded(BuildContext context, TarlanProvider provider) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (provider.error != null) {
-        showModalBottomSheet(
-            context: context,
-            isScrollControlled: false,
-            isDismissible: true,
-            builder: (context) => ErrorScreen(
-                  errorMessage: provider.error!.message ?? '',
-                  mainFormColor: HexColor(provider.colorsInfo.mainFormColor),
-                )).whenComplete(() {
-          provider.clearError();
-          SessionData().triggerOnErrorCallback();
-          Navigator.of(context).pop(); // Example: clear the error in the provider
-        });
-      }
-    });
   }
 
   Widget _buildForm(BuildContext context, TarlanProvider provider) {

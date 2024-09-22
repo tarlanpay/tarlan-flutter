@@ -248,6 +248,7 @@ final class TarlanProvider with ChangeNotifier {
           return;
         }
         error = ErrorResultRoute(type: ErrorDialogType.unsupported, message: transactionInfo.transactionStatus.name);
+        currentFlow = TarlanFlow.error;
         isLoading = false;
         notifyListeners();
         return;
@@ -297,6 +298,7 @@ final class TarlanProvider with ChangeNotifier {
 
   void _launchErrorFlow(ErrorResultRoute route) {
     isLoading = false;
+    currentFlow = TarlanFlow.error;
     error = route;
     notifyListeners();
   }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tarlan_payments/screens/receipt/receipt_design_constants.dart';
 import 'package:tarlan_payments/screens/receipt/receipt_header.dart';
+import 'package:tarlan_payments/screens/receipt/redirect_timer.dart';
 
 import '/data/model/common/session_data.dart';
 import '/domain/tarlan_provider.dart';
@@ -103,7 +104,10 @@ class _ReceiptState extends State<Receipt> {
                     Navigator.of(context).pop();
                   },
                 ),
-                const SizedBox(height: Space.l),
+                const SizedBox(height: Space.s),
+                provider.merchantInfo.hasRedirect
+                    ? RedirectTimer(timeout: provider.merchantInfo.timeout)
+                    : const SizedBox.shrink(),
                 const LogosRow(),
               ],
             ),
