@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'mock_data.dart';
@@ -19,7 +18,7 @@ class _ExampleTransactionCreateScreenState extends State<ExampleTransactionCreat
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(AppLocalizations.of(context)!.tarlanTransactionGeneratorTitle),
+            title: const Text('Tarlan Transaction Generator'),
           ),
           body: _buildBody(context, model),
         );
@@ -98,6 +97,12 @@ class _ExampleTransactionCreateScreenState extends State<ExampleTransactionCreat
         ElevatedButton(
           onPressed: model.switchEnvironment,
           child: const Text('Switch Environment'),
+        ),
+        const SizedBox(height: 16),
+        Text('Current locale: ${model.currentEnvironment.name}'),
+        ElevatedButton(
+          onPressed: model.switchEnvironment,
+          child: const Text('Switch locale'),
         ),
         const SizedBox(height: 16),
       ],
