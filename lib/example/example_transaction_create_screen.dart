@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'mock_data.dart';
@@ -27,82 +28,89 @@ class _ExampleTransactionCreateScreenState extends State<ExampleTransactionCreat
   }
 
   Widget _buildBody(BuildContext context, TransactionUrlProvider model) {
+    final appLocalizations = AppLocalizations.of(context)!;
     if (model.isLoading) {
       return const Center(child: CircularProgressIndicator());
     } else if (model.error != null) {
-      return Center(child: SafeArea(child: _showError(model)));
+      return Center(child: SafeArea(child: _showError(appLocalizations, model)));
     } else {
-      return Center(child: SafeArea(child: Padding(padding: const EdgeInsets.all(15), child: _buildContent(model))));
+      return Center(
+          child: SafeArea(
+              child: Padding(padding: const EdgeInsets.all(15), child: _buildContent(appLocalizations, model))));
     }
   }
 
-  Widget _showError(TransactionUrlProvider model) {
+  Widget _showError(AppLocalizations appLocalizations, TransactionUrlProvider model) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Error: ${model.error}'),
-        ElevatedButton(onPressed: model.clear, child: const Text('Back')),
+        Text('${appLocalizations.error}: ${model.error}'),
+        ElevatedButton(onPressed: model.clear, child: Text(appLocalizations.back)),
       ],
     );
   }
 
-  Widget _buildContent(TransactionUrlProvider model) {
+  Widget _buildContent(AppLocalizations appLocalizations, TransactionUrlProvider model) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (model.transactionLink != null) _buildTransactionLinkSection(model) else _buildOptions(model),
+        if (model.transactionLink != null)
+          _buildTransactionLinkSection(appLocalizations, model)
+        else
+          _buildOptions(appLocalizations, model),
       ],
     );
   }
 
-  Widget _buildTransactionLinkSection(TransactionUrlProvider model) {
+  Widget _buildTransactionLinkSection(AppLocalizations appLocalizations, TransactionUrlProvider model) {
     return Column(
       children: [
-        Text('Transaction Link: ${model.transactionLink}'),
+        Text('${appLocalizations.transactionLink}: ${model.transactionLink}'),
         ElevatedButton(
           onPressed: () => model.launchTarlanSDK(context, model.transactionLink!, model.currentEnvironment),
-          child: const Text('Launch Tarlan SDK'),
+          child: Text(appLocalizations.launchTarlanSdk),
         ),
         ElevatedButton(
           onPressed: model.clear,
-          child: const Text('Back'),
+          child: Text(appLocalizations.back),
         ),
       ],
     );
   }
 
-  Widget _buildOptions(TransactionUrlProvider model) {
+  Widget _buildOptions(AppLocalizations appLocalizations, TransactionUrlProvider model) {
     return Column(
       children: [
-        Text('Client ID: ${requestData['project_client_id']}'),
-        ElevatedButton(onPressed: model.generateRandomClientId, child: const Text('Generate new client ID')),
-        Text('Project Reference ID: ${requestData['project_reference_id']}'),
-        ElevatedButton(onPressed: model.generateRandomReferenceId, child: const Text('Generate new reference ID')),
+        Text('${appLocalizations.clientId}: ${requestData['project_client_id']}'),
+        ElevatedButton(onPressed: model.generateRandomClientId, child: Text(appLocalizations.generateNewClientId)),
+        Text('${appLocalizations.projectReferenceId}: ${requestData['project_reference_id']}'),
+        ElevatedButton(
+            onPressed: model.generateRandomReferenceId, child: Text(appLocalizations.generateNewReferenceId)),
         const SizedBox(height: 16),
-        const Text('Available actions:'),
+        Text(appLocalizations.availableActions),
         ElevatedButton(
           onPressed: () => model.createTransaction('PayIn'),
-          child: const Text('Pay In'),
+          child: Text(appLocalizations.payIn),
         ),
         ElevatedButton(
           onPressed: () => model.createTransaction('PayOut'),
-          child: const Text('Pay Out'),
+          child: Text(appLocalizations.payOut),
         ),
         ElevatedButton(
           onPressed: () => model.createTransaction('CardLink'),
-          child: const Text('Card Link'),
+          child: Text(appLocalizations.cardLink),
         ),
         const SizedBox(height: 16),
-        Text('Current environment: ${model.currentEnvironment.name}'),
+        Text('${appLocalizations.currentEnvironment} ${model.currentEnvironment.name}'),
         ElevatedButton(
           onPressed: model.switchEnvironment,
-          child: const Text('Switch Environment'),
+          child: Text(appLocalizations.switchEnvironment),
         ),
         const SizedBox(height: 16),
-        Text('Current locale: ${model.currentEnvironment.name}'),
+        Text('${appLocalizations.currentLocale} ${model.locale}'),
         ElevatedButton(
-          onPressed: model.switchEnvironment,
-          child: const Text('Switch locale'),
+          onPressed: () => model.switchLocale(context),
+          child: Text(appLocalizations.switchLocale),
         ),
         const SizedBox(height: 16),
       ],

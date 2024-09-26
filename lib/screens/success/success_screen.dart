@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../data/model/common/session_data.dart';
@@ -15,6 +16,7 @@ class SuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations appLocalizations = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: Space.xxl, horizontal: Space.m),
       child: Column(
@@ -23,9 +25,9 @@ class SuccessScreen extends StatelessWidget {
         children: [
           _buildSuccessIcon(),
           const SizedBox(height: Space.l),
-          _buildSuccessTitle(),
+          _buildSuccessTitle(appLocalizations.cardLinkedSuccessfully),
           const SizedBox(height: Space.s),
-          _buildSuccessMessage(),
+          _buildSuccessMessage(appLocalizations.cardSavedForFutureUse),
           const SizedBox(height: Space.l),
           _buildBackButton(context),
           const SizedBox(height: Space.l),
@@ -45,17 +47,17 @@ class SuccessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSuccessTitle() {
-    return const Text(
-      'Карта успешно привязана.',
-      style: TextStyle(color: Colors.green, fontSize: 18),
+  Widget _buildSuccessTitle(String value) {
+    return Text(
+      value,
+      style: const TextStyle(color: Colors.green, fontSize: 18),
     );
   }
 
-  Widget _buildSuccessMessage() {
-    return const Text(
-      'Ваша карта сохранена и будет доступна для повторного использование при оплате.',
-      style: TextStyle(fontSize: 16),
+  Widget _buildSuccessMessage(String value) {
+    return Text(
+      value,
+      style: const TextStyle(fontSize: 16),
       textAlign: TextAlign.center,
     );
   }
@@ -76,7 +78,7 @@ class SuccessScreen extends StatelessWidget {
           ),
         ),
         child: Text(
-          'Назад',
+          AppLocalizations.of(context)!.back,
           style: TextStyle(color: mainFormColor, fontSize: 14, fontWeight: FontWeight.bold),
         ),
       ),

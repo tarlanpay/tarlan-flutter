@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../data/model/common/session_data.dart';
@@ -17,6 +18,7 @@ class ErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations appLocalizations = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(Space.m),
       child: Column(
@@ -25,9 +27,9 @@ class ErrorScreen extends StatelessWidget {
         children: [
           _buildErrorIcon(),
           const SizedBox(height: Space.l),
-          _buildErrorTitle(),
+          _buildErrorTitle(appLocalizations.transactionFailed),
           const SizedBox(height: Space.s),
-          _buildErrorMessage(),
+          _buildErrorMessage(appLocalizations),
           const SizedBox(height: Space.l),
           _buildBackButton(context),
           const SizedBox(height: Space.l),
@@ -47,16 +49,16 @@ class ErrorScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorTitle() {
-    return const Text(
-      'Транзакция прошла неуспешно',
-      style: TextStyle(color: Colors.red, fontSize: 18),
+  Widget _buildErrorTitle(String value) {
+    return Text(
+      value,
+      style: const TextStyle(color: Colors.red, fontSize: 18),
     );
   }
 
-  Widget _buildErrorMessage() {
+  Widget _buildErrorMessage(AppLocalizations appLocalizations) {
     return Text(
-      errorMessage.isNotEmpty ? errorMessage : 'An unknown error occurred.',
+      errorMessage.isNotEmpty ? errorMessage : appLocalizations.unknownErrorOccurred,
       style: const TextStyle(fontSize: 16),
       textAlign: TextAlign.center,
     );
@@ -78,7 +80,7 @@ class ErrorScreen extends StatelessWidget {
           ),
         ),
         child: Text(
-          'Назад',
+          AppLocalizations.of(context)!.back,
           style: TextStyle(color: mainFormColor, fontSize: 14, fontWeight: FontWeight.bold),
         ),
       ),

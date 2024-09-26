@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../../domain/tarlan_provider.dart';
 import '../../../data/model/transaction/transaction_info.dart';
@@ -41,6 +42,7 @@ class _CardPickerState extends State<CardPicker> {
   @override
   Widget build(BuildContext context) {
     final mainColor = HexColor(widget.provider.colorsInfo.mainTextInputColor);
+    final appLocalizations = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
@@ -56,7 +58,7 @@ class _CardPickerState extends State<CardPicker> {
               const SizedBox(width: 48), // Spacer to balance the close button
               Expanded(
                 child: Text(
-                  'Сохраненные карты',
+                  appLocalizations.savedCards,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: mainColor),
                 ),
@@ -88,7 +90,7 @@ class _CardPickerState extends State<CardPicker> {
                   Navigator.pop(context);
                 },
                 child: Text(
-                  '+ Добавить новую карту',
+                  appLocalizations.addNewCard,
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: mainColor),
                 ),
               ),

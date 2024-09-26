@@ -29,7 +29,7 @@
   "switchLocale": "Switch locale",
   "cardLinkedSuccessfully": "Card successfully linked.",
   "cardSavedForFutureUse": "Your card is saved and will be available for reuse during payment.",
-  "returnToStoreInSeconds": "Return to the store page in: sec",
+  "returnToStoreInSeconds": "Return to the store page in: {remainingTime} sec",
   "saveReceipt": "Save receipt",
   "orderNumber": "Order number",
   "paymentAmount": "Payment amount",

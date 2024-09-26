@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:tarlan_payments/screens/receipt/receipt_design_constants.dart';
 
 import '../../utils/space.dart';
@@ -46,12 +47,13 @@ class _RedirectTimerState extends State<RedirectTimer> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations appLocalizations = AppLocalizations.of(context)!;
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: Space.m),
           child: Text(
-            'Возврат на страницу магазина через: $_remainingTime сек',
+            appLocalizations.returnToStoreInSeconds(_remainingTime),
             style: TextStyle(fontSize: 12, color: ReceiptDS.additionalTextColor),
           ),
         ),

@@ -4,6 +4,8 @@ import 'package:tarlan_payments/screens/common/tarlan_image.dart';
 
 import '../../../../domain/tarlan_provider.dart';
 import '../../../../utils/hex_color.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class ClassicHeader extends StatelessWidget {
   const ClassicHeader({super.key});
@@ -11,6 +13,7 @@ class ClassicHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TarlanProvider>(context);
+    final appLocalizations = AppLocalizations.of(context)!;
     return Row(
       children: <Widget>[
         TarlanImage(width: 64, height: 64, url: provider.merchantInfo.logoFilePath),
@@ -35,7 +38,7 @@ class ClassicHeader extends StatelessWidget {
                 const SizedBox(width: 20),
                 provider.isCardLink()
                     ? const SizedBox()
-                    : Text('Комиссия ${provider.transactionInfo.upperCommissionAmount.toString()}KZT',
+                    : Text('${appLocalizations.fee} ${provider.transactionInfo.upperCommissionAmount.toString()}KZT',
                         style: TextStyle(fontSize: 11, color: HexColor(provider.colorsInfo.mainTextColor))),
               ],
             )

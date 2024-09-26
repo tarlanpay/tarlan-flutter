@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:tarlan_payments/data/model/error/form_error_type.dart';
 
 import '/domain/tarlan_provider.dart';
 import '/utils/hex_color.dart';
@@ -28,11 +30,12 @@ class _CardHolderNameInputState extends State<CardHolderNameInput> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TarlanProvider>(context);
+    final AppLocalizations appLocalizations = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Label(
-          title: 'Имя владельца карты:',
+          title: appLocalizations.cardHolderName,
           hexColor: provider.colorsInfo.inputLabelColor,
         ),
         const SizedBox(height: 5),
@@ -56,7 +59,7 @@ class _CardHolderNameInputState extends State<CardHolderNameInput> {
                 width: 1.0,
               ),
             ),
-            errorText: provider.cardHolderError,
+            errorText: localisedErrorMessage(provider.cardHolderError, appLocalizations),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(5.0),
               borderSide: const BorderSide(

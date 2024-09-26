@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '/domain/tarlan_provider.dart';
+import '../../../data/model/error/form_error_type.dart';
 import '../../../utils/hex_color.dart';
 import 'label.dart';
 
@@ -50,11 +52,12 @@ class _ExpiryInputState extends State<ExpiryInput> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TarlanProvider>(context);
+    final AppLocalizations appLocalizations = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Label(
-          title: 'Срок действия карты:',
+          title: appLocalizations.cardExpiry,
           hexColor: provider.colorsInfo.inputLabelColor,
         ),
         const SizedBox(height: 5),
@@ -151,9 +154,9 @@ class _ExpiryInputState extends State<ExpiryInput> {
                 ))
           ],
         ),
-        _yearError || _monthError || provider.expiryError?.isNotEmpty == true
+        _yearError || _monthError || provider.expiryError != null
             ? Text(
-                provider.expiryError ?? "Неверный срок действия карты",
+                localisedErrorMessage(provider.expiryError, appLocalizations) ?? appLocalizations.invalidCardExpiry,
                 style: TextStyle(color: Colors.red[900], fontSize: 11),
               )
             : const SizedBox(),

@@ -1,0 +1,1 @@
+enum SupportedLocale { ru, en }

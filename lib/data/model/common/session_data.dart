@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tarlan_payments/data/model/common/supported_locale.dart';
 
 import '/network/environment.dart';
 import 'url_data.dart';
@@ -10,7 +11,7 @@ class SessionData {
 
   factory SessionData() => _instance;
 
-  String? _language;
+  SupportedLocale? _language;
   Environment? _environment;
   String? _merchantId;
   String? _projectId;
@@ -21,7 +22,7 @@ class SessionData {
   VoidCallback? _onSuccess;
   VoidCallback? _onError;
 
-  void setLanguage(String? lang) {
+  void setLanguage(SupportedLocale? lang) {
     _language = lang;
   }
 
@@ -62,7 +63,7 @@ class SessionData {
   }
 
   String getLanguage() {
-    return _language ?? 'ru';
+    return _language?.name ?? 'ru';
   }
 
   Environment getEnvironment() {

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '/domain/tarlan_provider.dart';
+import '../../../data/model/error/form_error_type.dart';
 import '../../../utils/hex_color.dart';
 import 'label.dart';
 
@@ -18,9 +20,11 @@ class CvvInput extends StatefulWidget {
 
 class _CvvState extends State<CvvInput> {
   final TextEditingController _controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TarlanProvider>(context);
+    final AppLocalizations appLocalizations = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -68,9 +72,9 @@ class _CvvState extends State<CvvInput> {
             },
           ),
         ),
-        provider.cvvError?.isNotEmpty == true
+        provider.cvvError != null
             ? Text(
-                provider.cvvError ?? "Неверный CVV",
+                localisedErrorMessage(provider.cvvError, appLocalizations) ?? appLocalizations.invalidCvv,
                 style: TextStyle(color: Colors.red[900], fontSize: 11),
               )
             : const SizedBox(),

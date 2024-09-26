@@ -29,7 +29,7 @@
   "switchLocale": "Сменить локаль",
   "cardLinkedSuccessfully": "Карта успешно привязана.",
   "cardSavedForFutureUse": "Ваша карта сохранена и будет доступна для повторного использования при оплате.",
-  "returnToStoreInSeconds": "Возврат на страницу магазина через: сек",
+  "returnToStoreInSeconds": "Возврат на страницу магазина через: {remainingTime} сек",
   "saveReceipt": "Сохранить квитанцию",
   "orderNumber": "Номер заказа",
   "paymentAmount": "Сумма оплаты",

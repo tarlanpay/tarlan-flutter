@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../data/model/error/form_error_type.dart';
 import '../../../domain/tarlan_provider.dart';
 import '../../../domain/validators/regex.dart';
 import '../../../utils/hex_color.dart';
@@ -21,13 +23,13 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
 
   String? _emailError;
 
-  void validateEmail(String email) {
+  void validateEmail(AppLocalizations appLocalizations, String email) {
     setState(() {
       if (email.isEmpty) {
         _emailError = null;
         return;
       } else if (!Regex.emailRegex.hasMatch(email)) {
-        _emailError = "Неверный формат электронного адреса";
+        _emailError = appLocalizations.invalidEmailFormat;
       } else {
         _emailError = null;
       }
@@ -37,6 +39,7 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TarlanProvider>(context);
+    final AppLocalizations appLocalizations = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -53,14 +56,14 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          provider.merchantInfo.hasPhone ? _buildPhone(provider) : const SizedBox(),
-          provider.merchantInfo.hasEmail ? _buildEmail(provider) : const SizedBox(),
+          provider.merchantInfo.hasPhone ? _buildPhone(appLocalizations, provider) : const SizedBox(),
+          provider.merchantInfo.hasEmail ? _buildEmail(appLocalizations, provider) : const SizedBox(),
         ],
       ),
     );
   }
 
-  Widget _buildEmail(TarlanProvider provider) {
+  Widget _buildEmail(AppLocalizations appLocalizations, TarlanProvider provider) {
     return Column(
       children: [
         Row(children: [
@@ -86,7 +89,7 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
             fillColor: HexColor(provider.colorsInfo.mainInputColor),
             filled: true,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0), borderSide: BorderSide.none),
-            errorText: _emailError ?? provider.emailError,
+            errorText: _emailError ?? localisedErrorMessage(provider.emailError, appLocalizations),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(5.0),
               borderSide: const BorderSide(
@@ -116,10 +119,10 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
           onChanged: (value) {
             String email = value.trim();
             provider.setUserEmail(email);
-            if (email.isNotEmpty && provider.emailError?.isNotEmpty == true) {
+            if (email.isNotEmpty && provider.emailError != null) {
               provider.clearEmailError();
             }
-            validateEmail(email);
+            validateEmail(appLocalizations, email);
           },
         ),
         const SizedBox(height: Space.m),
@@ -127,7 +130,7 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
     );
   }
 
-  Widget _buildPhone(TarlanProvider provider) {
+  Widget _buildPhone(AppLocalizations appLocalizations, TarlanProvider provider) {
     return Column(
       children: [
         Row(children: [
@@ -138,7 +141,7 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
                 )
               : const SizedBox(),
           Label(
-            title: 'Номер телефона:',
+            title: appLocalizations.phoneNumber,
             hexColor: provider.colorsInfo.inputLabelColor,
           ),
         ]),
@@ -164,7 +167,7 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
             hintStyle: TextStyle(color: HexColor(provider.colorsInfo.mainTextInputColor)),
             isDense: true,
             contentPadding: const EdgeInsets.all(5),
-            errorText: provider.phoneError,
+            errorText: localisedErrorMessage(provider.phoneError, appLocalizations),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(5.0),
               borderSide: const BorderSide(
@@ -182,7 +185,7 @@ class _PhoneEmailState extends State<PhoneEmailInput> {
           ),
           onChanged: (value) {
             provider.setUserPhone(value);
-            if (value.isNotEmpty && provider.phoneError?.isNotEmpty == true) {
+            if (value.isNotEmpty && provider.phoneError != null) {
               provider.clearPhoneError();
             }
           },

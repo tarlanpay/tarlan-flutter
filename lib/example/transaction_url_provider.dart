@@ -1,8 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:tarlan_payments/data/model/common/supported_locale.dart';
 import 'package:tarlan_transaction_generator/tarlan_transaction_generator.dart';
 
+import '../domain/providers/locale_provider.dart';
 import '../network/environment.dart';
 import '../utils/tarlan_builder.dart';
 import 'mock_data.dart';
@@ -13,6 +16,7 @@ class TransactionUrlProvider extends ChangeNotifier {
   bool isLoading = false;
   String? transactionLink;
   String? error;
+  String? locale = 'en';
 
   TransactionUrlProvider() : generator = TarlanTransactionGenerator(secret: secret, environment: Environment.prod.name);
 
@@ -60,6 +64,18 @@ class TransactionUrlProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void switchLocale(BuildContext context) {
+    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+
+    if (localeProvider.locale.languageCode == 'en') {
+      locale = 'Русский';
+      localeProvider.setLocale(const Locale('ru'));
+    } else {
+      locale = 'English';
+      localeProvider.setLocale(const Locale('en'));
+    }
+  }
+
   void clear() {
     error = null;
     transactionLink = null;
@@ -86,10 +102,13 @@ class TransactionUrlProvider extends ChangeNotifier {
   }
 
   void launchTarlanSDK(BuildContext context, String url, Environment currentEnvironment) {
+    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+    SupportedLocale supportedLocale =
+        localeProvider.locale.languageCode == 'en' ? SupportedLocale.en : SupportedLocale.ru;
     TarlanBuilder(context: context, url: url)
-        .onSuccess(() => print('Success callback triggered!'))
-        .onError(() => print('Error callback triggered!'))
-        .language('en')
+        .onSuccess(() => debugPrint('Success callback triggered!'))
+        .onError(() => debugPrint('Error callback triggered!'))
+        .language(supportedLocale)
         .environment(currentEnvironment)
         .merchantId(requestData['merchant_id'].toString())
         .projectId(requestData['project_id'].toString())

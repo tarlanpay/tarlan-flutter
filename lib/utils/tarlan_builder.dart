@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '/network/environment.dart';
+import 'package:tarlan_payments/data/model/common/supported_locale.dart';
 
+import '/network/environment.dart';
 import '../data/model/common/session_data.dart';
 import '../data/model/common/url_data.dart';
 import '../screens/parent.dart';
@@ -10,7 +11,7 @@ class TarlanBuilder {
   final String url;
   VoidCallback? _onSuccess;
   VoidCallback? _onError;
-  String? _language;
+  SupportedLocale? _language;
   Environment? _environment;
   String? _merchantId;
   String? _projectId;
@@ -30,7 +31,7 @@ class TarlanBuilder {
     return this;
   }
 
-  TarlanBuilder language(String language) {
+  TarlanBuilder language(SupportedLocale language) {
     _language = language;
     return this;
   }

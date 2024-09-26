@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:tarlan_payments/data/api_constants.dart';
 import 'package:tarlan_payments/data/model/common/session_data.dart';
+import 'package:tarlan_payments/data/model/error/form_error_type.dart';
 import 'package:tarlan_payments/domain/error_dialog_type.dart';
 import 'package:tarlan_payments/domain/validators/regex.dart';
 import 'package:tarlan_payments/network/api_client.dart';
@@ -44,12 +45,12 @@ final class TarlanProvider with ChangeNotifier {
   var currentFlow = TarlanFlow.form;
   ErrorResultRoute? error;
 
-  String? emailError;
-  String? cardError;
-  String? expiryError;
-  String? cvvError;
-  String? cardHolderError;
-  String? phoneError;
+  FormError? emailError;
+  FormError? cardError;
+  FormError? expiryError;
+  FormError? cvvError;
+  FormError? cardHolderError;
+  FormError? phoneError;
 
   var disposed = false;
 
@@ -425,13 +426,13 @@ final class TarlanProvider with ChangeNotifier {
     }
     String card = paymentHelper.cardEncryptData.pan ?? '';
     if (card.isEmpty) {
-      cardError = "Необходимо указать номер карты";
+      cardError = FormError.emptyCard; //"Необходимо указать номер карты";
       notifyListeners();
       return false;
     }
 
     if (card.length != 16) {
-      cardError = "Номер карты указан неверно";
+      cardError = FormError.invalidCard; //"Номер карты указан неверно";
       notifyListeners();
       return false;
     }
@@ -448,7 +449,7 @@ final class TarlanProvider with ChangeNotifier {
     String month = paymentHelper.cardEncryptData.month ?? '';
     String year = paymentHelper.cardEncryptData.year ?? '';
     if (month.isEmpty || year.isEmpty) {
-      expiryError = "Укажите срок действия карты";
+      expiryError = FormError.emptyExpiry; //"Укажите срок действия карты";
       notifyListeners();
       return false;
     }
@@ -464,7 +465,7 @@ final class TarlanProvider with ChangeNotifier {
     }
     String cvv = paymentHelper.cardEncryptData.cvc ?? '';
     if (cvv.isEmpty) {
-      cvvError = "Укажите CVV";
+      cvvError = FormError.emptyCvv; //"Укажите CVV";
       notifyListeners();
       return false;
     }
@@ -480,7 +481,7 @@ final class TarlanProvider with ChangeNotifier {
     }
     String name = paymentHelper.cardEncryptData.fullName ?? '';
     if (name.isEmpty) {
-      cardHolderError = "Необходимо указать имя держателя карты";
+      cardHolderError = FormError.emptyCardholder; //"Необходимо указать имя держателя карты";
       notifyListeners();
       return false;
     }
@@ -508,13 +509,13 @@ final class TarlanProvider with ChangeNotifier {
     }
 
     if (email.isEmpty && merchantInfo.requiredEmail && merchantInfo.hasEmail) {
-      emailError = "Необходимо указать электронный адрес";
+      emailError = FormError.emptyEmail; //"Необходимо указать электронный адрес";
       notifyListeners();
       return false;
     }
 
     if (!Regex.emailRegex.hasMatch(email) && email.isNotEmpty) {
-      emailError = "Неверный формат электронного адреса";
+      emailError = FormError.invalidEmail; //"Неверный формат электронного адреса";
       notifyListeners();
       return false;
     }
@@ -541,13 +542,13 @@ final class TarlanProvider with ChangeNotifier {
         phone = paymentHelper.payInPostData.userPhone ?? '';
     }
     if (phone.isEmpty && merchantInfo.requiredPhone && merchantInfo.hasPhone) {
-      phoneError = "Необходимо указать номер телефона";
+      phoneError = FormError.emptyPhone; //"Необходимо указать номер телефона";
       notifyListeners();
       return false;
     }
 
     if (phone.length != 18 && phone.isNotEmpty) {
-      phoneError = "Номер телефона указан не полностью";
+      phoneError = FormError.invalidPhone; //"Номер телефона указан не полностью";
       notifyListeners();
       return false;
     }

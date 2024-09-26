@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:tarlan_payments/data/model/error/form_error_type.dart';
 
 import '../../../../data/model/transaction/transaction_info.dart';
 import '../../../../domain/tarlan_provider.dart';
@@ -46,7 +48,6 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
     super.initState();
     final provider = Provider.of<TarlanProvider>(context, listen: false);
     final cards = provider.transactionInfo.cards;
-
     // Initialize the TextEditingController with the maskedPan of the first TransactionCard if available
     _controller = TextEditingController(
       text: cards.isNotEmpty ? cards.first.maskedPan : '',
@@ -57,14 +58,14 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
     return provider.transactionInfo.cards.map((e) => e.maskedPan).toList();
   }
 
-  void _validateCardNumber(String value) {
+  void _validateCardNumber(AppLocalizations appLocalizations, String value) {
     setState(() {
       bool isFilled = value.length == 19;
       if (isFilled) {
         bool basicValidation = RegExp(r'^\d{4} \d{4} \d{4} \d{4}$').hasMatch(value);
         bool luhnValidity = checkLuhnValidity(value.replaceAll(" ", ''));
         if (!basicValidation || !luhnValidity) {
-          _localError = 'Такой карты не существует';
+          _localError = appLocalizations.cardDoesNotExist;
         } else {
           _localError = null;
         }
@@ -103,6 +104,7 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
     final provider = Provider.of<TarlanProvider>(context);
     final menuItems = _getMenuItems(provider);
     final cards = provider.transactionInfo.cards;
+    final appLocalizations = AppLocalizations.of(context)!;
 
     return Container(
       decoration: BoxDecoration(
@@ -121,11 +123,11 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Label(
-            title: 'Номер карты:',
+            title: appLocalizations.cardNumber,
             hexColor: provider.colorsInfo.inputLabelColor,
           ),
           const SizedBox(height: Space.xs),
-          _buildCardNumberInput(provider, menuItems, cards),
+          _buildCardNumberInput(appLocalizations, provider, menuItems, cards),
           if (provider.showDetails()) ...[
             const SizedBox(height: Space.m),
             Row(
@@ -152,7 +154,8 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
     );
   }
 
-  Widget _buildCardNumberInput(TarlanProvider provider, List<String> menuItems, List<TransactionCard> cards) {
+  Widget _buildCardNumberInput(
+      AppLocalizations appLocalizations, TarlanProvider provider, List<String> menuItems, List<TransactionCard> cards) {
     return TextField(
       textAlign: TextAlign.center,
       focusNode: _cardNumberFocus,
@@ -169,7 +172,7 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
           borderRadius: BorderRadius.circular(5.0),
           borderSide: BorderSide.none,
         ),
-        errorText: _localError ?? provider.cardError,
+        errorText: _localError ?? localisedErrorMessage(provider.cardError, appLocalizations),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5.0),
           borderSide: const BorderSide(
@@ -211,7 +214,7 @@ class _ClassicCardInputState extends State<ClassicCardInput> {
           provider.clearCardError();
           _localError = null;
         }
-        _validateCardNumber(value);
+        _validateCardNumber(appLocalizations, value);
       },
     );
   }

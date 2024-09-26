@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:tarlan_payments/screens/common/logos.dart';
 import 'package:tarlan_payments/screens/payment_form/ui/phone_email_input.dart';
@@ -29,6 +30,7 @@ class _PaymentFormState extends State<PaymentForm> {
   }
 
   Widget _buildForm(BuildContext context, TarlanProvider provider) {
+    final AppLocalizations appLocalizations = AppLocalizations.of(context)!;
     return LayoutBuilder(builder: (context, constraints) {
       return SingleChildScrollView(
         padding: EdgeInsets.only(
@@ -47,14 +49,16 @@ class _PaymentFormState extends State<PaymentForm> {
                   const SizedBox(height: Space.l),
                   const ClassicCardInput(),
                   const SizedBox(height: Space.s),
-                  provider.showRememberCardOption() ? _buildRememberCardRow(provider) : const SizedBox(height: Space.s),
+                  provider.showRememberCardOption()
+                      ? _buildRememberCardRow(appLocalizations, provider)
+                      : const SizedBox(height: Space.s),
                   const SizedBox(height: Space.s),
                   provider.hasPhoneEmail() ? const PhoneEmailInput() : const SizedBox(),
                   const SizedBox(height: Space.s),
                   if (!provider.showDetails()) const SizedBox(height: 24),
-                  _buildPayButton(context, provider),
+                  _buildPayButton(appLocalizations, context, provider),
                   const SizedBox(height: Space.s),
-                  _buildCancelButton(context, provider),
+                  _buildCancelButton(appLocalizations, context, provider),
                   const SizedBox(height: Space.l),
                   const LogosRow(),
                 ],
@@ -70,12 +74,12 @@ class _PaymentFormState extends State<PaymentForm> {
     return provider.isClassicTheme() ? const ClassicHeader() : const LightHeader();
   }
 
-  Widget _buildRememberCardRow(TarlanProvider provider) {
+  Widget _buildRememberCardRow(AppLocalizations appLocalizations, TarlanProvider provider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Label(
-          title: 'Запомнить карту',
+          title: appLocalizations.rememberCard,
           hexColor: provider.colorsInfo.mainTextColor,
           fontSize: 14,
         ),
@@ -96,7 +100,7 @@ class _PaymentFormState extends State<PaymentForm> {
     );
   }
 
-  Widget _buildPayButton(BuildContext context, TarlanProvider provider) {
+  Widget _buildPayButton(AppLocalizations appLocalizations, BuildContext context, TarlanProvider provider) {
     return Container(
       width: double.infinity,
       height: 44,
@@ -119,7 +123,9 @@ class _PaymentFormState extends State<PaymentForm> {
           shadowColor: Colors.transparent,
         ),
         child: Text(
-          provider.isCardLink() ? 'ПРИВЯЗАТЬ КАРТУ' : 'ОПЛАТИТЬ ${provider.transactionInfo.totalAmount.toString()}₸',
+          provider.isCardLink()
+              ? appLocalizations.linkCard
+              : '${appLocalizations.pay} ${provider.transactionInfo.totalAmount.toString()}₸',
           style: TextStyle(
             color: HexColor(provider.colorsInfo.mainTextInputColor),
             fontSize: 14,
@@ -130,7 +136,7 @@ class _PaymentFormState extends State<PaymentForm> {
     );
   }
 
-  Widget _buildCancelButton(BuildContext context, TarlanProvider provider) {
+  Widget _buildCancelButton(AppLocalizations appLocalizations, BuildContext context, TarlanProvider provider) {
     return SizedBox(
       width: double.infinity,
       height: 44,
@@ -146,7 +152,7 @@ class _PaymentFormState extends State<PaymentForm> {
           ),
         ),
         child: Text(
-          'Отменить',
+          appLocalizations.cancel,
           style: TextStyle(
             color: HexColor(provider.colorsInfo.mainFormColor),
             fontSize: 14,

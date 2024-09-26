@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tarlan_payments/screens/receipt/receipt_design_constants.dart';
@@ -24,14 +25,9 @@ class _ReceiptState extends State<Receipt> {
   String? savePdfTitle;
 
   @override
-  void initState() {
-    super.initState();
-    savePdfTitle = 'Сохранить квитанцию';
-  }
-
-  @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TarlanProvider>(context);
+    final AppLocalizations appLocalizations = AppLocalizations.of(context)!;
     return provider.isLoading
         ? const Center(child: CircularProgressIndicator())
         : SingleChildScrollView(
@@ -44,21 +40,24 @@ class _ReceiptState extends State<Receipt> {
                 const SizedBox(height: Space.xl),
                 DashedLine(color: HexColor('#A4A4A4')),
                 const SizedBox(height: Space.l),
-                _buildReceiptRow(context, 'Номер заказа', '№${provider.receiptInfo.transactionId}'),
-                _buildDashedLine(),
-                const SizedBox(height: Space.m),
                 _buildReceiptRow(
-                    context, 'Сумма оплаты', '${provider.receiptInfo.orderAmount}${provider.receiptInfo.currency}'),
+                    appLocalizations, context, appLocalizations.orderNumber, '№${provider.receiptInfo.transactionId}'),
                 _buildDashedLine(),
                 const SizedBox(height: Space.m),
-                _buildReceiptRow(context, 'Комиссия',
+                _buildReceiptRow(appLocalizations, context, appLocalizations.paymentAmount,
+                    '${provider.receiptInfo.orderAmount}${provider.receiptInfo.currency}'),
+                _buildDashedLine(),
+                const SizedBox(height: Space.m),
+                _buildReceiptRow(appLocalizations, context, appLocalizations.fee,
                     '${provider.receiptInfo.upperCommissionAmount}${provider.receiptInfo.currency}'),
                 _buildDashedLine(),
                 const SizedBox(height: Space.m),
-                _buildReceiptRow(context, 'Дата транзакции', '${provider.receiptInfo.dateTime}'),
+                _buildReceiptRow(
+                    appLocalizations, context, appLocalizations.transactionDate, '${provider.receiptInfo.dateTime}'),
                 _buildDashedLine(),
                 const SizedBox(height: Space.m),
-                _buildReceiptRow(context, 'Банк-эквайер', provider.receiptInfo.acquirerName),
+                _buildReceiptRow(
+                    appLocalizations, context, appLocalizations.acquirerBank, provider.receiptInfo.acquirerName),
                 _buildDashedLine(),
                 const SizedBox(height: Space.m),
                 Center(
@@ -72,25 +71,25 @@ class _ReceiptState extends State<Receipt> {
                 const SizedBox(height: Space.l),
                 _buildOutlinedButton(
                   context,
-                  savePdfTitle,
+                  savePdfTitle ?? appLocalizations.saveReceipt,
                   () {
                     FileDownloader.downloadFile(
                         url: provider.receiptPdfUrl(),
                         name: '${provider.receiptInfo.transactionId.toString()}.pdf',
                         onProgress: (fileName, progress) {
                           setState(() {
-                            savePdfTitle = 'Загрузка квитанции...';
+                            savePdfTitle = appLocalizations.loadingReceipt;
                           });
                         },
                         onDownloadCompleted: (String path) {
-                          share(path);
+                          share(appLocalizations, path);
                           setState(() {
-                            savePdfTitle = 'Сохранить квитанцию';
+                            savePdfTitle = appLocalizations.saveReceipt;
                           });
                         },
                         onDownloadError: (String error) {
                           setState(() {
-                            savePdfTitle = 'Ошибка загрузки квитанции';
+                            savePdfTitle = appLocalizations.errorLoadingReceipt;
                           });
                         });
                   },
@@ -98,7 +97,7 @@ class _ReceiptState extends State<Receipt> {
                 const SizedBox(height: Space.m),
                 _buildOutlinedButton(
                   context,
-                  'Назад',
+                  appLocalizations.back,
                   () {
                     SessionData().triggerOnErrorCallback();
                     Navigator.of(context).pop();
@@ -114,11 +113,11 @@ class _ReceiptState extends State<Receipt> {
           );
   }
 
-  void share(String path) async {
-    await Share.shareXFiles([XFile(path)], text: 'Квитанция');
+  void share(AppLocalizations appLocalizations, String path) async {
+    await Share.shareXFiles([XFile(path)], text: appLocalizations.receipt);
   }
 
-  Widget _buildReceiptRow(BuildContext context, String label, String? value) {
+  Widget _buildReceiptRow(AppLocalizations appLocalizations, BuildContext context, String label, String? value) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Space.m),
       child: Column(
@@ -131,7 +130,7 @@ class _ReceiptState extends State<Receipt> {
                 style: TextStyle(fontSize: 12, color: ReceiptDS.additionalTextColor),
               ),
               Text(
-                value ?? 'Неизвестно',
+                value ?? appLocalizations.unknown,
                 style: TextStyle(fontSize: 12, color: ReceiptDS.secondaryTextColor),
               ),
             ],
