@@ -25,8 +25,8 @@
   "cardLink": "Привязать карту",
   "currentEnvironment": "Текущая среда:",
   "switchEnvironment": "Сменить среду",
-  "currentLocale": "Текущая локаль:",
-  "switchLocale": "Сменить локаль",
+  "currentLocale": "Текущий язык",
+  "switchLocale": "Сменить язык",
   "cardLinkedSuccessfully": "Карта успешно привязана.",
   "cardSavedForFutureUse": "Ваша карта сохранена и будет доступна для повторного использования при оплате.",
   "returnToStoreInSeconds": "Возврат на страницу магазина через: {remainingTime} сек",
@@ -50,9 +50,11 @@
   "cardNumber": "Номер карты:",
   "savedCards": "Сохраненные карты",
   "addNewCard": "+ Добавить новую карту",
-  "cardHolderName": "Имя владельца карты:",
+  "cardHolderName": "Имя на карте",
   "invalidCvv": "Неверный CVV",
   "cardExpiry": "Срок действия карты:",
   "invalidCardExpiry": "Неверный срок действия карты",
-  "phoneNumber": "Номер телефона:"
+  "phoneNumber": "Номер телефона:",
+  "merchant": "Мерчант",
+  "type": "Тип"
 }

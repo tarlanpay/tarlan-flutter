@@ -41,25 +41,22 @@ class _ReceiptState extends State<Receipt> {
                 DashedLine(color: HexColor('#A4A4A4')),
                 const SizedBox(height: Space.l),
                 _buildReceiptRow(
-                    appLocalizations, context, appLocalizations.orderNumber, '№${provider.receiptInfo.transactionId}'),
-                _buildDashedLine(),
-                const SizedBox(height: Space.m),
-                _buildReceiptRow(appLocalizations, context, appLocalizations.paymentAmount,
+                    appLocalizations, appLocalizations.orderNumber, '№${provider.receiptInfo.transactionId}'),
+                _buildReceiptRow(appLocalizations, appLocalizations.paymentAmount,
                     '${provider.receiptInfo.orderAmount}${provider.receiptInfo.currency}'),
-                _buildDashedLine(),
-                const SizedBox(height: Space.m),
-                _buildReceiptRow(appLocalizations, context, appLocalizations.fee,
+                _buildReceiptRow(appLocalizations, appLocalizations.merchant, provider.merchantInfo.storeName),
+                _buildReceiptRow(appLocalizations, appLocalizations.acquirerBank, provider.receiptInfo.acquirerName),
+                provider.receiptInfo.email.isNotEmpty && provider.merchantInfo.requiredEmail
+                    ? _buildReceiptRow(appLocalizations, 'Email', provider.receiptInfo.email)
+                    : const SizedBox.shrink(),
+                provider.receiptInfo.phone.isNotEmpty && provider.merchantInfo.requiredPhone
+                    ? _buildReceiptRow(appLocalizations, appLocalizations.phoneNumber, provider.receiptInfo.phone)
+                    : const SizedBox.shrink(),
+                _buildReceiptRow(
+                    appLocalizations, appLocalizations.transactionDate, '${provider.receiptInfo.dateTime}'),
+                _buildReceiptRow(appLocalizations, appLocalizations.fee,
                     '${provider.receiptInfo.upperCommissionAmount}${provider.receiptInfo.currency}'),
-                _buildDashedLine(),
-                const SizedBox(height: Space.m),
-                _buildReceiptRow(
-                    appLocalizations, context, appLocalizations.transactionDate, '${provider.receiptInfo.dateTime}'),
-                _buildDashedLine(),
-                const SizedBox(height: Space.m),
-                _buildReceiptRow(
-                    appLocalizations, context, appLocalizations.acquirerBank, provider.receiptInfo.acquirerName),
-                _buildDashedLine(),
-                const SizedBox(height: Space.m),
+                _buildReceiptRow(appLocalizations, appLocalizations.type, provider.receiptInfo.transactionType),
                 Center(
                   child: Text(
                     provider.receiptInfo.paymentOrganization,
@@ -117,26 +114,33 @@ class _ReceiptState extends State<Receipt> {
     await Share.shareXFiles([XFile(path)], text: appLocalizations.receipt);
   }
 
-  Widget _buildReceiptRow(AppLocalizations appLocalizations, BuildContext context, String label, String? value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Space.m),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildReceiptRow(AppLocalizations appLocalizations, String label, String? value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: Space.m),
+          child: Column(
             children: [
-              Text(
-                label,
-                style: TextStyle(fontSize: 12, color: ReceiptDS.additionalTextColor),
-              ),
-              Text(
-                value ?? appLocalizations.unknown,
-                style: TextStyle(fontSize: 12, color: ReceiptDS.secondaryTextColor),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(fontSize: 12, color: ReceiptDS.additionalTextColor),
+                  ),
+                  Text(
+                    value ?? appLocalizations.unknown,
+                    style: TextStyle(fontSize: 12, color: ReceiptDS.secondaryTextColor),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        _buildDashedLine(),
+        const SizedBox(height: Space.m),
+      ],
     );
   }
 

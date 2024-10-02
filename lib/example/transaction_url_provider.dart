@@ -68,6 +68,9 @@ class TransactionUrlProvider extends ChangeNotifier {
     final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
 
     if (localeProvider.locale.languageCode == 'en') {
+      locale = 'Қазақ тілі';
+      localeProvider.setLocale(const Locale('kk'));
+    } else if (localeProvider.locale.languageCode == 'kk') {
       locale = 'Русский';
       localeProvider.setLocale(const Locale('ru'));
     } else {

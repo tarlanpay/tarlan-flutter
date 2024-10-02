@@ -11,7 +11,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => TransactionUrlProvider()),
-        ChangeNotifierProvider(create: (context) => LocaleProvider()), // Provide the LocaleProvider
+        ChangeNotifierProvider(create: (context) => LocaleProvider()),
       ],
       child: const MyApp(),
     ),
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           ),
-          locale: localeProvider.locale, // Set locale here
+          locale: localeProvider.locale,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: const ExampleTransactionCreateScreen(),
