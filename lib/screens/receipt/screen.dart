@@ -46,10 +46,10 @@ class _ReceiptState extends State<Receipt> {
                     '${provider.receiptInfo.orderAmount}${provider.receiptInfo.currency}'),
                 _buildReceiptRow(appLocalizations, appLocalizations.merchant, provider.merchantInfo.storeName),
                 _buildReceiptRow(appLocalizations, appLocalizations.acquirerBank, provider.receiptInfo.acquirerName),
-                provider.receiptInfo.email.isNotEmpty && provider.merchantInfo.requiredEmail
+                provider.receiptInfo.email.isNotEmpty
                     ? _buildReceiptRow(appLocalizations, 'Email', provider.receiptInfo.email)
                     : const SizedBox.shrink(),
-                provider.receiptInfo.phone.isNotEmpty && provider.merchantInfo.requiredPhone
+                provider.receiptInfo.phone.isNotEmpty
                     ? _buildReceiptRow(appLocalizations, appLocalizations.phoneNumber, provider.receiptInfo.phone)
                     : const SizedBox.shrink(),
                 _buildReceiptRow(

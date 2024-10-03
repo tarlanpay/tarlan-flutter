@@ -25,7 +25,7 @@
   "cardLink": "Привязать карту",
   "currentEnvironment": "Текущая среда:",
   "switchEnvironment": "Сменить среду",
-  "currentLocale": "Текущий язык",
+  "currentLocale": "Текущий язык:",
   "switchLocale": "Сменить язык",
   "cardLinkedSuccessfully": "Карта успешно привязана.",
   "cardSavedForFutureUse": "Ваша карта сохранена и будет доступна для повторного использования при оплате.",
