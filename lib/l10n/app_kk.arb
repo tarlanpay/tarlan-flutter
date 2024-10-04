@@ -56,5 +56,7 @@
   "invalidCardExpiry": "Картаның жарамдылық мерзімі дұрыс емес",
   "phoneNumber": "Телефон нөмірі:",
   "merchant": "Мерчант",
-  "type": "Тип"
+  "type": "Тип",
+  "card_link_in_progress_title": "Картаны тіркеу өңделуде",
+  "card_link_in_progress_message": "Сіздің картаңызды тіркеу операциясы өңделуде"
 }

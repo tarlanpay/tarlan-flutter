@@ -56,5 +56,7 @@
   "invalidCardExpiry": "Invalid card expiry",
   "phoneNumber": "Phone number",
   "merchant": "Merchant",
-  "type": "Type"
+  "type": "Type",
+  "card_link_in_progress_title": "Card linking is in progress",
+  "card_link_in_progress_message": "The operation to link your card is in progress"
 }

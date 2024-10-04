@@ -75,19 +75,34 @@ final class TarlanProvider with ChangeNotifier {
       type = TarlanType.fromTransactionInfo(transactionInfo);
       status = TarlanStatus.fromTransactionInfo(transactionInfo);
 
+      if (goToError()) {
+        _launchErrorFlow(
+            ErrorResultRoute(type: ErrorDialogType.unsupported, message: transactionInfo.transactionStatus.name));
+        return;
+      }
+
       if (goToReceipt()) {
         _launchReceipt();
-      } else if (goToCardLinkResult()) {
-        _launchSuccessFlow(SuccessDialogResultRoute());
-      } else {
-        checkForOneClick();
-
-        if (disposed) {
-          return;
-        }
-        isLoading = false;
-        notifyListeners();
+        return;
       }
+
+      if (goToCardLinkResult()) {
+        _launchSuccessFlow(SuccessDialogResultRoute());
+        return;
+      }
+
+      if (goToCardProcess()) {
+        _launchCardProcessFlow();
+        return;
+      }
+
+      checkForOneClick();
+
+      if (disposed) {
+        return;
+      }
+      isLoading = false;
+      notifyListeners();
     } catch (_) {
       if (disposed) {
         return;
@@ -115,11 +130,19 @@ final class TarlanProvider with ChangeNotifier {
   }
 
   bool goToReceipt() {
-    return type != TarlanType.cardLink && !_isNewTransaction();
+    return type != TarlanType.cardLink && status == TarlanStatus.success;
+  }
+
+  bool goToError() {
+    return status == TarlanStatus.failed;
   }
 
   bool goToCardLinkResult() {
-    return type == TarlanType.cardLink && !_isNewTransaction();
+    return type == TarlanType.cardLink && status == TarlanStatus.success;
+  }
+
+  bool goToCardProcess() {
+    return status == TarlanStatus.cardProcessing;
   }
 
   bool _isNewTransaction() => status == TarlanStatus.newTransaction;
@@ -200,7 +223,6 @@ final class TarlanProvider with ChangeNotifier {
   }
 
   void _launch3DS(ThreeDs data) {
-    debugPrint("Launching 3DS: ${data.toJson()}");
     threeDs = data;
     currentFlow = TarlanFlow.threeDs;
     notifyListeners();
@@ -307,6 +329,12 @@ final class TarlanProvider with ChangeNotifier {
   void _launchSuccessFlow(SuccessDialogResultRoute route) {
     isLoading = false;
     currentFlow = TarlanFlow.success;
+    notifyListeners();
+  }
+
+  void _launchCardProcessFlow() {
+    isLoading = false;
+    currentFlow = TarlanFlow.cardProcessing;
     notifyListeners();
   }
 
@@ -590,7 +618,11 @@ final class TarlanProvider with ChangeNotifier {
 
   String receiptPdfUrl() {
     final urlData = SessionData().getUrlData();
-    final queryParameters = {'hash': urlData?.hash, 'id': urlData?.transactionId, 'locale': 'ru'};
+    final queryParameters = {
+      'hash': urlData?.hash,
+      'id': urlData?.transactionId,
+      'locale': SessionData().getLanguage()
+    };
     final uri = Uri.https(ApiClient().baseUrl(ApiType.main), ApiConstants.pathReceiptDownload, queryParameters);
     return uri.toString();
   }

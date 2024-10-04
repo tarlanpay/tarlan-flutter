@@ -56,5 +56,7 @@
   "invalidCardExpiry": "Неверный срок действия карты",
   "phoneNumber": "Номер телефона:",
   "merchant": "Мерчант",
-  "type": "Тип"
+  "type": "Тип",
+  "card_link_in_progress_title": "Привязка карты в обработке",
+  "card_link_in_progress_message": "Операция по привязке Вашей карты находится в обработке"
 }
