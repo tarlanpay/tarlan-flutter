@@ -8,8 +8,8 @@ import '../../utils/space.dart';
 
 class RedirectTimer extends StatefulWidget {
   final int timeout;
-
-  const RedirectTimer({super.key, required this.timeout});
+  final double? fontSize;
+  const RedirectTimer({super.key, required this.timeout, this.fontSize});
 
   @override
   _RedirectTimerState createState() => _RedirectTimerState();
@@ -54,7 +54,7 @@ class _RedirectTimerState extends State<RedirectTimer> {
           padding: const EdgeInsets.symmetric(horizontal: Space.m),
           child: Text(
             appLocalizations.returnToStoreInSeconds(_remainingTime),
-            style: TextStyle(fontSize: 12, color: ReceiptDS.additionalTextColor),
+            style: TextStyle(fontSize: widget.fontSize ?? 12, color: ReceiptDS.additionalTextColor),
           ),
         ),
         const SizedBox(height: Space.s),

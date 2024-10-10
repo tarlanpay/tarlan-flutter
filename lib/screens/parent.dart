@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tarlan_payments/screens/card_processing/screen.dart';
-import 'package:tarlan_payments/screens/error/screen.dart';
 import 'package:tarlan_payments/screens/payment_form/fingerprint/fingerprint_form.dart';
-import 'package:tarlan_payments/screens/success/success_screen.dart';
+import 'package:tarlan_payments/screens/status_show/screen.dart';
 
 import '/domain/tarlan_provider.dart';
 import '/screens/receipt/screen.dart';
@@ -44,14 +42,15 @@ class TarlanMainWidget extends StatelessWidget {
         return const FingerprintForm();
       case TarlanFlow.receipt:
         return const Receipt();
-      case TarlanFlow.success:
-        return SuccessScreen(mainFormColor: HexColor(provider.colorsInfo.mainFormColor));
-      case TarlanFlow.cardProcessing:
-        return CardProcessingScreen(mainFormColor: HexColor(provider.colorsInfo.mainFormColor));
-      case TarlanFlow.error:
-        return ErrorScreen(
-            errorMessage: provider.error?.message ?? 'Unexpected error',
-            mainFormColor: HexColor(provider.colorsInfo.mainFormColor));
+      case TarlanFlow.statusShow:
+        return StatusShowScreen(
+          mainFormColor: HexColor(provider.colorsInfo.mainFormColor),
+          status: provider.status,
+          type: provider.type,
+          transactionId: provider.transactionInfo.transactionId.toString(),
+          hasRedirect: provider.merchantInfo.hasRedirect,
+          timeout: provider.merchantInfo.timeout,
+        );
     }
   }
 }

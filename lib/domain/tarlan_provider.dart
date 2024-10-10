@@ -6,7 +6,6 @@ import 'package:pointycastle/asymmetric/api.dart';
 import 'package:tarlan_payments/data/api_constants.dart';
 import 'package:tarlan_payments/data/model/common/session_data.dart';
 import 'package:tarlan_payments/data/model/error/form_error_type.dart';
-import 'package:tarlan_payments/domain/error_dialog_type.dart';
 import 'package:tarlan_payments/domain/validators/regex.dart';
 import 'package:tarlan_payments/network/api_client.dart';
 
@@ -43,7 +42,6 @@ final class TarlanProvider with ChangeNotifier {
 
   var isLoading = true;
   var currentFlow = TarlanFlow.form;
-  ErrorResultRoute? error;
 
   FormError? emailError;
   FormError? cardError;
@@ -71,28 +69,14 @@ final class TarlanProvider with ChangeNotifier {
       paymentHelper = PaymentHelper();
       colorsInfo = await merchantWebService.getColorsInfo();
       merchantInfo = await merchantWebService.getMerchantInfo();
-      transactionInfo = await transactionWebService.getTransactionInfo();
-      type = TarlanType.fromTransactionInfo(transactionInfo);
-      status = TarlanStatus.fromTransactionInfo(transactionInfo);
-
-      if (goToError()) {
-        _launchErrorFlow(
-            ErrorResultRoute(type: ErrorDialogType.unsupported, message: transactionInfo.transactionStatus.name));
-        return;
-      }
-
+      await _updateTransactionInfo();
       if (goToReceipt()) {
         _launchReceipt();
         return;
       }
 
-      if (goToCardLinkResult()) {
-        _launchSuccessFlow(SuccessDialogResultRoute());
-        return;
-      }
-
-      if (goToCardProcess()) {
-        _launchCardProcessFlow();
+      if (!_isNewTransaction()) {
+        _launchStatusShow();
         return;
       }
 
@@ -109,6 +93,19 @@ final class TarlanProvider with ChangeNotifier {
       }
       isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> _updateTransactionInfo() async {
+    try {
+      transactionInfo = await transactionWebService.getTransactionInfo();
+      type = TarlanType.fromTransactionInfo(transactionInfo);
+      status = TarlanStatus.fromTransactionInfo(transactionInfo);
+    } catch (e) {
+      if (disposed) {
+        return;
+      }
+      _launchStatusShow();
     }
   }
 
@@ -142,10 +139,16 @@ final class TarlanProvider with ChangeNotifier {
   }
 
   bool goToCardProcess() {
-    return status == TarlanStatus.cardProcessing;
+    return status == TarlanStatus.processed;
   }
 
   bool _isNewTransaction() => status == TarlanStatus.newTransaction;
+
+  void _launchStatusShow() {
+    isLoading = false;
+    currentFlow = TarlanFlow.statusShow;
+    notifyListeners();
+  }
 
   void switchToOneClick() {
     if (type == TarlanType.payIn) {
@@ -210,7 +213,7 @@ final class TarlanProvider with ChangeNotifier {
 
   void checkPaymentResultRoute(PaymentResultRoute route) {
     if (route is ErrorResultRoute) {
-      _launchErrorFlow(route);
+      _launchStatusShow();
     } else if (route is ReceiptResultRoute) {
       _launchReceipt();
     } else if (route is ThreeDsResultRoute) {
@@ -218,7 +221,7 @@ final class TarlanProvider with ChangeNotifier {
     } else if (route is FingerprintResultRoute) {
       _launchFingerprint(route.fingerprint);
     } else if (route is SuccessDialogResultRoute) {
-      _launchSuccessFlow(route);
+      _launchStatusShow();
     }
   }
 
@@ -256,46 +259,31 @@ final class TarlanProvider with ChangeNotifier {
       if (disposed) {
         return;
       }
-      error = ErrorResultRoute(type: ErrorDialogType.unsupported, message: 'Unknown');
-      isLoading = false;
-      notifyListeners();
+      _launchStatusShow();
     }
   }
 
   Future<void> _verifyCardLink() async {
     try {
-      transactionInfo = await transactionWebService.getTransactionInfo();
-
-      if (transactionInfo.transactionStatus.code != "success") {
-        if (disposed) {
-          return;
-        }
-        error = ErrorResultRoute(type: ErrorDialogType.unsupported, message: transactionInfo.transactionStatus.name);
-        currentFlow = TarlanFlow.error;
-        isLoading = false;
-        notifyListeners();
-        return;
-      }
-      _launchSuccessFlow(SuccessDialogResultRoute());
+      await _updateTransactionInfo();
+      _launchStatusShow();
     } catch (_) {
       if (disposed) {
         return;
       }
-      error = ErrorResultRoute(type: ErrorDialogType.unsupported, message: 'Unknown');
-      isLoading = false;
-      notifyListeners();
+      _launchStatusShow();
     }
   }
 
   Future<void> _launchReceipt() async {
     try {
-      transactionInfo = await transactionWebService.getTransactionInfo();
+      await _updateTransactionInfo();
 
       if (transactionInfo.transactionStatus.code != "success") {
         if (disposed) {
           return;
         }
-        error = ErrorResultRoute(type: ErrorDialogType.unsupported, message: transactionInfo.transactionStatus.name);
+        _launchStatusShow();
         isLoading = false;
         notifyListeners();
         return;
@@ -313,34 +301,8 @@ final class TarlanProvider with ChangeNotifier {
       if (disposed) {
         return;
       }
-      error = ErrorResultRoute(type: ErrorDialogType.unsupported, message: 'Unknown');
-      isLoading = false;
-      notifyListeners();
+      _launchStatusShow();
     }
-  }
-
-  void _launchErrorFlow(ErrorResultRoute route) {
-    isLoading = false;
-    currentFlow = TarlanFlow.error;
-    error = route;
-    notifyListeners();
-  }
-
-  void _launchSuccessFlow(SuccessDialogResultRoute route) {
-    isLoading = false;
-    currentFlow = TarlanFlow.success;
-    notifyListeners();
-  }
-
-  void _launchCardProcessFlow() {
-    isLoading = false;
-    currentFlow = TarlanFlow.cardProcessing;
-    notifyListeners();
-  }
-
-  void clearError() {
-    error = null;
-    notifyListeners();
   }
 
   bool isClassicTheme() => colorsInfo.viewType == 'classic' || colorsInfo.viewType.isEmpty == true;

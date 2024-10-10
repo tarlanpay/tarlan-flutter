@@ -4,9 +4,13 @@ enum TarlanStatus {
   newTransaction,
   success,
   failed,
+  error,
   refund,
-  unsupported,
-  cardProcessing;
+  refundWaiting,
+  authorized,
+  canceled,
+  processed,
+  unsupported;
 
   factory TarlanStatus.fromTransactionInfo(TransactionInfo? info) {
     switch (info?.transactionStatus.code) {
@@ -17,11 +21,17 @@ enum TarlanStatus {
       case 'failed':
         return TarlanStatus.failed;
       case 'error':
-        return TarlanStatus.failed;
+        return TarlanStatus.error;
       case 'refund':
         return TarlanStatus.refund;
       case 'processed':
-        return TarlanStatus.cardProcessing;
+        return TarlanStatus.processed;
+      case 'canceled':
+        return TarlanStatus.canceled;
+      case 'authorized':
+        return TarlanStatus.authorized;
+      case 'refund_waiting':
+        return TarlanStatus.refundWaiting;
     }
     return TarlanStatus.unsupported;
   }
