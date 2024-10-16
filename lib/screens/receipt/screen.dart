@@ -72,6 +72,7 @@ class _ReceiptState extends State<Receipt> {
                   () {
                     FileDownloader.downloadFile(
                         url: provider.receiptPdfUrl(),
+                        headers: {'accept-language': SessionData().getLanguage()},
                         name: '${provider.receiptInfo.transactionId.toString()}.pdf',
                         onProgress: (fileName, progress) {
                           setState(() {

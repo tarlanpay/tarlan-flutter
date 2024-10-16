@@ -106,12 +106,10 @@ class TransactionUrlProvider extends ChangeNotifier {
 
   void launchTarlanSDK(BuildContext context, String url, Environment currentEnvironment) {
     final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
-    SupportedLocale supportedLocale =
-        localeProvider.locale.languageCode == 'en' ? SupportedLocale.en : SupportedLocale.ru;
     TarlanBuilder(context: context, url: url)
         .onSuccess(() => debugPrint('Success callback triggered!'))
         .onError(() => debugPrint('Error callback triggered!'))
-        .language(supportedLocale)
+        .language(getSupportedLocale(localeProvider.locale.languageCode))
         .environment(currentEnvironment)
         .merchantId(requestData['merchant_id'].toString())
         .projectId(requestData['project_id'].toString())

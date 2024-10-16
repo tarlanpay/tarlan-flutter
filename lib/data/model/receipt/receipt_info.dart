@@ -35,7 +35,7 @@ class ReceiptInfo {
   num totalAmount;
   String currency;
   String projectName;
-  String logo;
+  String? logo;
   String acquirerName;
   String paymentOrganization;
   DateTime dateTime;
@@ -52,7 +52,7 @@ class ReceiptInfo {
     required this.totalAmount,
     required this.currency,
     required this.projectName,
-    required this.logo,
+    this.logo,
     required this.acquirerName,
     required this.paymentOrganization,
     required this.dateTime,

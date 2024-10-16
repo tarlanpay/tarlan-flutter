@@ -42,7 +42,7 @@ class TransactionInfo {
   num orderAmount;
   num upperCommissionAmount;
   num totalAmount;
-  String logo;
+  String? logo;
   TransactionInfoUrls transactionInfo;
   TransactionStatus transactionStatus;
   TransactionStatus transactionType;
@@ -59,7 +59,7 @@ class TransactionInfo {
     required this.orderAmount,
     required this.upperCommissionAmount,
     required this.totalAmount,
-    required this.logo,
+    this.logo,
     required this.transactionInfo,
     required this.transactionStatus,
     required this.transactionType,

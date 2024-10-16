@@ -29,8 +29,8 @@ final class TarlanProvider with ChangeNotifier {
   late MerchantInfo merchantInfo;
   late TransactionInfo transactionInfo;
   late ReceiptInfo receiptInfo;
-  late TarlanType type;
-  late TarlanStatus status;
+  TarlanType type = TarlanType.unsupported;
+  TarlanStatus status = TarlanStatus.unsupported;
   late ThreeDs threeDs;
   late Fingerprint fingerprint;
 
